@@ -37,7 +37,7 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr){
         return (Math.pow((futurePrice/currentPrice), (1/years)) - 1);
     }
 
-    let valuationObj = {}
+    let valuationObj = {};
 
     let futureMetric = calcFutureValue(metric,growthRate, years);
     let valuationMultiple = calcValuationMultiple(beta, erp, rfr);
