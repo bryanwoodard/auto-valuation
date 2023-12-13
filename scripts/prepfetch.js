@@ -1,5 +1,6 @@
 // functions to fetch and retrieve the object.
 
+// Grabs all of the statements into one big obj
 function fetch(symbol){
 
     function grab(statement){
@@ -52,22 +53,17 @@ function fetch(symbol){
 
 
 
-//next steps transform the fetched obj 
-//take the data that is fetched
+//take the statements that are fetched and transform them into a flat simple obj
 function prepCurrent(obj){
     let statementsObj = obj;
     let incomeObj = statementsObj.income[0];
     let cashflowObj = statementsObj.cashflow[0];
     let balanceObj = statementsObj.balancesheet[0];
     let keyMetricsObj = statementsObj.keymetrics[0];
+    let ratios = statementsObj.ratios[0];
+
+    console.log()
     
-    /* Prob cut out below
-    let finCalc = {}
-    finCalc.returnOn = (cashflow,base)=>{
-        // cashflow = fcf || deps|| operating cashflow etc...
-        // Base = bookvalue || capital || assets || 
-       return cashflow/base;
-    }*/
 
     // example of object
     var keyStatsCurrent = {
@@ -77,7 +73,8 @@ function prepCurrent(obj){
         "Price/Diluted EPS": keyMetricsObj.peRatio /*using basic-- edit to include "price" value*/ ,
         "ROC(cf)": cashflowObj.freeCashFlow/(balanceObj.longTermDebt + balanceObj.totalEquity ) ,
         "ROC(deps)": (incomeObj.epsdiluted*incomeObj.weightedAverageShsOutDil)/(balanceObj.longTermDebt + balanceObj.totalEquity ),
-        "EV/Ebitda": keyMetricsObj.enterpriseValueOverEBITDA
+        "EV/Ebitda": keyMetricsObj.enterpriseValueOverEBITDA,
+        "FreeCashFlow": ratios.freeCashFlowPerShare
     }
 
     console.log("current stats", keyStatsCurrent);
@@ -88,6 +85,3 @@ function prepCurrent(obj){
 
 }
 
-/*var fetched = fetch("AAPL");
-console.log("this is fetched",fetched);
-prepCurrent(fetched);*/

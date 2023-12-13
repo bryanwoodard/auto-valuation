@@ -42,8 +42,3 @@ let template = (obj)=>{
     };
 }
 
-var fetched = fetch("googl");
-console.log("this is fetched",fetched);
-var keyStats= prepCurrent(fetched);
-console.log("this is the keystats obj",keyStats);
-template(keyStats);

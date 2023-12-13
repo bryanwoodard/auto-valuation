@@ -1,6 +1,4 @@
 // script to use the data provided and make a valuations
-
-
 /*
 how to value a company
 
@@ -11,17 +9,17 @@ how to value a company
 - get the fair value based on the current expectations when return is equal to wacc
 
 */
-function value(metric, years, erp, beta,  currentPrice, growthRate, rfr){
+function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate){
 
     let calcFutureValue = function(metric, growthRate, years){
         //console.log(metric * Math.pow((1+growthRate),years));
         return (metric * Math.pow((1+growthRate),years));
     }
 
-    let calcValuationMultiple = function(beta, erp, rfr ){
+    let calcTerminalMultiple = function(beta, erp, rfr ){
         //returns capm ... also think about including cost of debt and wacc as well
         //rfr = .05;
-        return 1/(rfr + (beta*erp));
+        return 1/( (rfr + (beta*erp)) - terminalGrowthRate );
     }
 
     let calcFuturePrice = function(futureMetric, multiple){
@@ -40,21 +38,36 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr){
     let valuationObj = {};
 
     let futureMetric = calcFutureValue(metric,growthRate, years);
-    let valuationMultiple = calcValuationMultiple(beta, erp, rfr);
-    let futurePrice = calcFuturePrice(futureMetric, valuationMultiple);
-    let fairValueRate = 1/(calcValuationMultiple(beta,erp, rfr));
+    let terminalMultiple = calcTerminalMultiple(beta, erp, rfr);
+    let futurePrice = calcFuturePrice(futureMetric, terminalMultiple);
+    let fairValueRate = 1/(calcTerminalMultiple(beta,erp, rfr));
     
     valuationObj.futurePrice = futurePrice;
     valuationObj.futureMetric = futureMetric;
-    valuationObj.valuationMultiple = valuationMultiple;
+    valuationObj.terminalMultiple = terminalMultiple;
     valuationObj.compoundedReturnCurrent = calcCompoundRate(futurePrice, currentPrice, years );
     valuationObj.buyPrice = calcPresentValue(futurePrice, .15, years);
     valuationObj.fairValue = calcPresentValue(futurePrice, fairValueRate, years);
     
 
-    console.log(JSON.stringify(valuationObj));
+    console.log("valuation obj = ", valuationObj);
     return valuationObj;
 
 }
-//not returning what id expect > come back to it
-value(1, 10, .04, 1.2, 10, .10, .05);
+
+//========== Where the actual work happens ====================
+var fetched = fetch("goog");
+var keyStats= prepCurrent(fetched);
+template(keyStats);
+
+template(value(keyStats["FreeCashFlow"], 5, .045, 1.05, 134.06, keyStats["ROC(cf)"], .05, .05 ));
+
+/*
+Next steps;
+    - build the html interface to accept values -- on index
+    - build the option to use the specific metric values (cashflow or eps)
+    - build the option to output multiple scenarios
+    - eleminate all the fucntion declarations in value object... set vals as params
+    - make pretty
+
+*/
