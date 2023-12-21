@@ -1,12 +1,126 @@
-// script to use the data provided and make a valuations
-/*
-how to value a company
+/*Template engine
+sample obj
+let data = [
+	{
+		"symbol": "AAPL",
+		"revenuePerShare": 24.31727304755197,
+		"netIncomePerShare": 6.154614437637777,
+		"operatingCashFlowPerShare": 7.532762624088375,
+		"freeCashFlowPerShare": 6.872425646259799,
+		"cashPerShare": 2.9787931805221803
+		
+	}
+]
 
-- determine future valuation metric: op cash flow/total capital or ROE
-- derive future multiple
-- derive future price
-- get the present value based on current price based on desired return (buy price)
-- get the fair value based on the current expectations when return is equal to wacc
+
+*/
+
+
+
+let template = (obj)=>{
+    
+    let element = ``;
+    let bodyElement = document.getElementsByTagName("body")[0];
+    let parentDiv = document.createElement("div");
+    bodyElement.appendChild(parentDiv);
+    
+    for (let key in obj){
+        //debugger;
+        let shortNum;
+        if(typeof obj[key] == "number"){
+            shortNum = obj[key].toString().substring(0,4); 
+        } else{
+            shortNum = obj[key];
+        }
+        element = element + `${key} : ${shortNum} \n`;
+
+        let node = document.createElement("p");
+        let content = document.createTextNode(`${key} : ${shortNum} \n`);
+        parentDiv.appendChild(node).appendChild(content);
+
+    };
+}
+
+
+// functions to fetch and retrieve the object.
+    // Grabs all of the statements into one big obj
+function fetch(symbol){
+
+    function grab(statement){
+        let apiURL = `https://financialmodelingprep.com/api/v3/${statement}/${symbol}?period=annual&${apiKey}`;
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", apiURL, false);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // The request was successful
+                var resp = JSON.parse(xhr.responseText);
+                if(statement == "income-statement" ){
+                    statementsObj.income = resp;
+                }else if(statement == "cash-flow-statement"){
+                    statementsObj.cashflow = resp;
+                }else if(statement == "balance-sheet-statement"){
+                    statementsObj.balancesheet = resp;
+                }else if(statement == "key-metrics") {
+                    statementsObj.keymetrics = resp;
+                }else{
+                    statementsObj.ratios = resp;
+                }
+                //console.log(resp);
+            } else {
+                // The request failed
+                console.log("bad request");
+            }
+        };
+    
+        xhr.send();
+        
+    } 
+    
+    var statementsObj = {};
+    let apiKey = "apikey=Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
+    let statements = ["income-statement", 
+        "balance-sheet-statement", 
+        "cash-flow-statement", 
+        "key-metrics",
+        "ratios"
+    ];
+    statements.forEach(grab);
+    return statementsObj;
+}
+//take the statements that are fetched and transform them into a flat simple obj
+function prepCurrent(obj){
+    let statementsObj = obj;
+    let incomeObj = statementsObj.income[0];
+    let cashflowObj = statementsObj.cashflow[0];
+    let balanceObj = statementsObj.balancesheet[0];
+    let keyMetricsObj = statementsObj.keymetrics[0];
+    let ratios = statementsObj.ratios[0];    
+
+    // example of object
+    var keyStatsCurrent = {
+        "ROE(cf)": keyMetricsObj.freeCashFlowPerShare/keyMetricsObj.bookValuePerShare,
+        "ROE(deps)": incomeObj.epsdiluted/keyMetricsObj.bookValuePerShare,
+        "Price/FCF": keyMetricsObj.pfcfRatio,
+        "Price/Diluted EPS": keyMetricsObj.peRatio /*using basic-- edit to include "price" value*/ ,
+        "ROC(cf)": cashflowObj.freeCashFlow/(balanceObj.longTermDebt + balanceObj.totalEquity ) ,
+        "ROC(deps)": (incomeObj.epsdiluted*incomeObj.weightedAverageShsOutDil)/(balanceObj.longTermDebt + balanceObj.totalEquity ),
+        "EV/Ebitda": keyMetricsObj.enterpriseValueOverEBITDA,
+        "FreeCashFlow": ratios.freeCashFlowPerShare
+    }
+
+    console.log("current stats", keyStatsCurrent);
+
+    return keyStatsCurrent;
+}
+/*
+    script to use the data provided and make a valuations
+
+    how to value a company
+        - determine future valuation metric: op cash flow/total capital or ROE
+        - derive future multiple
+        - derive future price
+        - get the present value based on current price based on desired return (buy price)
+        - get the fair value based on the current expectations when return is equal to wacc
 
 */
 function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate){
@@ -56,11 +170,36 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
 }
 
 //========== Where the actual work happens ====================
-var fetched = fetch("goog");
+/*var fetched = fetch("now");
 var keyStats= prepCurrent(fetched);
 template(keyStats);
 
-template(value(keyStats["FreeCashFlow"], 5, .045, 1.05, 134.06, keyStats["ROC(cf)"], .05, .05 ));
+template(value(keyStats["FreeCashFlow"], 10, .04, 1.35, 689.06, keyStats["ROC(cf)"]*.7, .05, .05 ));
+*/
+
+function analyze(){
+    let form = document.querySelector("form");
+    let processingObj = {};
+
+    for(let i = 0; i< form.length-1; i++){
+        let inputValue = form[i].value;
+        let inputLabel = form[i].id;
+       
+        processingObj[inputLabel] = inputValue;
+    }
+    
+    console.log(processingObj);
+    
+
+    var fetched = fetch(ticker);
+    var keyStats= prepCurrent(fetched);
+    template(keyStats);
+    template(value(keyStats[metric], 10, .04, 1.35, 689.06, keyStats["ROC(cf)"], .05, .05 ));
+    
+
+}
+
+;
 
 /*
 Next steps;

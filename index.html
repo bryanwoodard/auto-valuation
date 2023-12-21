@@ -5,12 +5,48 @@
     </head>
 
     <body>
-        <script src="scripts/prepfetch.js"></script>
-        <script src="scripts/rates.js"></script>
-        <script src="scripts/template.js"></script>
-        <script src="scripts/value.js"></script>
+        <div id="header">
+            <h1>Valuation Tool</h1>
+        </div>
 
 
+
+        metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate
+        <div id = "form">
+            <form>
+                <label for="symbol">Symbol:</label>
+                <input type="text" id="ticker" name="" >
+                <br>
+                <label for="years"># of Years:</label>
+                <input type="text" id="years" name="" >
+                <br>
+                <label for="erp">Equity Risk Premium:</label>
+                <input type="text" id="erp" name="" >
+                <br>
+                <label for="beta">Beta:</label>
+                <input type="text" id="beta" name="" >
+                <br>
+                <label for="rfr">Risk Free Rate:</label>
+                <input type="text" id="rfr" name="" >
+                <br>
+                <label for="tgr">Terminal Growth Rate:</label>
+                <input type="text" id="tgr" name="" >
+                <br>
+                <label for="valuation-metric">Valuation Metric:</label>
+                <select id="valuation-metric" name="valuationMetric">
+                    <option value="FreeCashFlow">Free Cash Flow</option>
+                    <option value="dilutedEPS">Diluted Eps</option>
+                </select>
+                <br>
+                <input type="button" value="Submit" onclick="analyze()">
+                
+            </form>
+        </div>
 
     </body>
+
+    <footer>
+        <script src="scripts/rates.js"></script>
+        <script src="scripts/value.js"></script>
+    </footer>
 </html>
