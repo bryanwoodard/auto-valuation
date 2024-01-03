@@ -47,7 +47,13 @@ let template = (obj)=>{
 function fetch(symbol){
 
     function grab(statement){
-        let apiURL = `https://financialmodelingprep.com/api/v3/${statement}/${symbol}?period=annual&${apiKey}`;
+        if(statement == "price"){
+            var apiURL = `https://financialmodelingprep.com/api/v3/stock/real-time-price/${symbol}?${apiKey}`;
+        }else{
+            var apiURL = `https://financialmodelingprep.com/api/v3/${statement}/${symbol}?period=annual&${apiKey}`;
+        }
+
+        
         let xhr = new XMLHttpRequest();
         xhr.open("GET", apiURL, false);
         xhr.onload = function() {
@@ -62,6 +68,8 @@ function fetch(symbol){
                     statementsObj.balancesheet = resp;
                 }else if(statement == "key-metrics") {
                     statementsObj.keymetrics = resp;
+                }else if(statement == "price") {
+                    statementsObj.price = resp;
                 }else{
                     statementsObj.ratios = resp;
                 }
@@ -82,7 +90,8 @@ function fetch(symbol){
         "balance-sheet-statement", 
         "cash-flow-statement", 
         "key-metrics",
-        "ratios"
+        "ratios",
+        "price"
     ];
     statements.forEach(grab);
     return statementsObj;
@@ -94,7 +103,8 @@ function prepCurrent(obj){
     let cashflowObj = statementsObj.cashflow[0];
     let balanceObj = statementsObj.balancesheet[0];
     let keyMetricsObj = statementsObj.keymetrics[0];
-    let ratios = statementsObj.ratios[0];    
+    let ratios = statementsObj.ratios[0];  
+    let price = statementsObj.price.companiesPriceList[0].price;
 
     // example of object
     var keyStatsCurrent = {
@@ -105,7 +115,8 @@ function prepCurrent(obj){
         "ROC(cf)": cashflowObj.freeCashFlow/(balanceObj.longTermDebt + balanceObj.totalEquity ) ,
         "ROC(deps)": (incomeObj.epsdiluted*incomeObj.weightedAverageShsOutDil)/(balanceObj.longTermDebt + balanceObj.totalEquity ),
         "EV/Ebitda": keyMetricsObj.enterpriseValueOverEBITDA,
-        "FreeCashFlow": ratios.freeCashFlowPerShare
+        "FreeCashFlow": ratios.freeCashFlowPerShare,
+        "Price": price
     }
 
     console.log("current stats", keyStatsCurrent);
@@ -124,6 +135,7 @@ function prepCurrent(obj){
 
 */
 function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate){
+
 
     let calcFutureValue = function(metric, growthRate, years){
         //console.log(metric * Math.pow((1+growthRate),years));
@@ -189,12 +201,26 @@ function analyze(){
     }
     
     console.log(processingObj);
-    
+
+    var ticker = processingObj.ticker;
 
     var fetched = fetch(ticker);
     var keyStats= prepCurrent(fetched);
+
+    var valuationLabel = processingObj.valuationMetric;
+    var years = Number(processingObj.years);
+    var valuationMetric = Number(keyStats[valuationLabel]);
+    var erp = Number(processingObj.erp);
+    var beta = Number(processingObj.beta);
+    var price = keyStats.Price;
+    var growthRate = keyStats["ROC(cf)"];
+    var rfr = Number(processingObj.rfr);
+    var terminalGrowthRate = Number(processingObj.tgr);
+
+
+    
     template(keyStats);
-    template(value(keyStats[metric], 10, .04, 1.35, 689.06, keyStats["ROC(cf)"], .05, .05 ));
+    template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate ));
     
 
 }
@@ -203,10 +229,16 @@ function analyze(){
 
 /*
 Next steps;
-    - build the html interface to accept values -- on index
+    √- build the html interface to accept values -- on index
     - build the option to use the specific metric values (cashflow or eps)
-    - build the option to output multiple scenarios
+    - build in option to set own expected grwoth rate
+    - build in option to specify dilution and buybacks.
+    - build the option to output multiple scenarios (good normal bad) with specific probs
+    - add in error handling
+    - build in handling of negative values.
+    - build in functionality to show average return ratios for last 5 yrs
     - eleminate all the fucntion declarations in value object... set vals as params
     - make pretty
+    - build to use cash from operations, and to set the expected capex percentage.
 
 */
