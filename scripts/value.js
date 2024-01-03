@@ -225,7 +225,7 @@ function analyze(){
 
 }
 
-;
+
 
 /*
 Next steps;
