@@ -277,8 +277,7 @@ function analyze(){
 
 
 /*
-Next steps;
-    √- build the html interface to accept values -- on index
+Next  long term steps;
     - build the option to use the specific metric values (cashflow or eps)
     - build in option to set own expected grwoth rate
     - build in option to specify dilution and buybacks.
@@ -291,5 +290,11 @@ Next steps;
     - build to use cash from operations, and to set the expected capex percentage.
     - add functionality to remove the elements on page if any when running another valuation
 
+
+    Immediate Next steps:
+        - add capability to use diluted eps.  see notes on line 249
+        - add functionailty to consolidate scenarios into one buy price and display .
+        - add to template function a check to see if the key contains an object and display that 
+            - to fix the [object object] showing for scenarios.
 
 */
