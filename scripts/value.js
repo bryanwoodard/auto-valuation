@@ -134,7 +134,7 @@ function prepCurrent(obj){
         - get the fair value based on the current expectations when return is equal to wacc
 
 */
-function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate){
+function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities){
 
 
     let calcFutureValue = function(metric, growthRate, years){
@@ -161,23 +161,62 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         return (Math.pow((futurePrice/currentPrice), (1/years)) - 1);
     }
 
-    let valuationObj = {};
+    var probabalisticValuations = {
+        best:{},
+        normal:{},
+        worst:{}
+    };
 
-    let futureMetric = calcFutureValue(metric,growthRate, years);
-    let terminalMultiple = calcTerminalMultiple(beta, erp, rfr);
-    let futurePrice = calcFuturePrice(futureMetric, terminalMultiple);
-    let fairValueRate = 1/(calcTerminalMultiple(beta,erp, rfr));
+    for (var i = 0; i<growthCaseScenarios.length; i++ ){
+        // return 3 valuation objects in one object.
+        let valuationObj = {};
+
+        let terminalModifier = 1;
+        
+        if(i < 1){
+            terminalModifier = 1.2
+        }else if(i > 1){
+            terminalModifier = .6
+        }
+
+        let futureMetric = calcFutureValue(metric,growthRate * growthCaseScenarios[i], years);
+        let terminalMultiple = calcTerminalMultiple(beta, erp, rfr) * terminalModifier;
+        let futurePrice = calcFuturePrice(futureMetric, terminalMultiple);
+        let fairValueRate = 1/(calcTerminalMultiple(beta,erp, rfr));
+        
+        valuationObj.futurePrice = futurePrice;
+        valuationObj.futureMetric = futureMetric;
+        valuationObj.terminalMultiple = terminalMultiple ;
+        valuationObj.compoundedReturnCurrent = calcCompoundRate(futurePrice, currentPrice, years );
+        valuationObj.buyPrice = calcPresentValue(futurePrice, desiredReturn, years); // add in factor to get desired return
+        valuationObj.fairValue = calcPresentValue(futurePrice, fairValueRate, years);
+        valuationObj.growthRateOfMetric = growthRate * growthCaseScenarios[i];
+        
+
+        console.log(`${Object.keys(probabalisticValuations)[i]} scenario = `, valuationObj);
+        probabalisticValuations[Object.keys(probabalisticValuations)[i]] = valuationObj;
+    }
+
+    return probabalisticValuations
+
+
+    // let valuationObj = {};
+
+    // let futureMetric = calcFutureValue(metric,growthRate, years);
+    // let terminalMultiple = calcTerminalMultiple(beta, erp, rfr);
+    // let futurePrice = calcFuturePrice(futureMetric, terminalMultiple);
+    // let fairValueRate = 1/(calcTerminalMultiple(beta,erp, rfr));
     
-    valuationObj.futurePrice = futurePrice;
-    valuationObj.futureMetric = futureMetric;
-    valuationObj.terminalMultiple = terminalMultiple;
-    valuationObj.compoundedReturnCurrent = calcCompoundRate(futurePrice, currentPrice, years );
-    valuationObj.buyPrice = calcPresentValue(futurePrice, .15, years);
-    valuationObj.fairValue = calcPresentValue(futurePrice, fairValueRate, years);
+    // valuationObj.futurePrice = futurePrice;
+    // valuationObj.futureMetric = futureMetric;
+    // valuationObj.terminalMultiple = terminalMultiple;
+    // valuationObj.compoundedReturnCurrent = calcCompoundRate(futurePrice, currentPrice, years );
+    // valuationObj.buyPrice = calcPresentValue(futurePrice, .15, years);
+    // valuationObj.fairValue = calcPresentValue(futurePrice, fairValueRate, years);
     
 
-    console.log("valuation obj = ", valuationObj);
-    return valuationObj;
+    // console.log("valuation obj = ", valuationObj);
+    // return valuationObj;
 
 }
 
@@ -207,20 +246,30 @@ function analyze(){
     var fetched = fetch(ticker);
     var keyStats= prepCurrent(fetched);
 
-    var valuationLabel = processingObj.valuationMetric;
+    var valuationLabel = processingObj.valuationMetric; // add entry into key stats object to include Diluted eps start value ... like freecashflow.
     var years = Number(processingObj.years);
     var valuationMetric = Number(keyStats[valuationLabel]);
     var erp = Number(processingObj.erp);
     var beta = Number(processingObj.beta);
     var price = keyStats.Price;
-    var growthRate = keyStats["ROC(cf)"];
+    var growthRate = valuationLabel == "FreeCashFlow"? keyStats["ROC(cf)"]: keyStats["ROC(deps)"] ;
     var rfr = Number(processingObj.rfr);
     var terminalGrowthRate = Number(processingObj.tgr);
+    var bestGrowth = Number(processingObj.bestGrowth);
+    var normalGrowth = Number(processingObj.normalGrowth);
+    var worstGrowth = Number(processingObj.worstGrowth);
+
+    var growthCaseScenarios = [bestGrowth, normalGrowth, worstGrowth];
+
+    var desiredReturn = Number(processingObj.desiredReturn);
+
+    var probabilities = [processingObj.bestProb, processingObj.normalProb, processingObj.worstProb]
+
 
 
     
     template(keyStats);
-    template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate ));
+    template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
     
 
 }
@@ -240,5 +289,7 @@ Next steps;
     - eleminate all the fucntion declarations in value object... set vals as params
     - make pretty
     - build to use cash from operations, and to set the expected capex percentage.
+    - add functionality to remove the elements on page if any when running another valuation
+
 
 */
