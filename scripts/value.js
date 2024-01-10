@@ -99,6 +99,7 @@ function fetch(symbol){
 //take the statements that are fetched and transform them into a flat simple obj
 function prepCurrent(obj){
     let statementsObj = obj;
+    
     let incomeObj = statementsObj.income[0];
     let cashflowObj = statementsObj.cashflow[0];
     let balanceObj = statementsObj.balancesheet[0];
@@ -106,7 +107,7 @@ function prepCurrent(obj){
     let ratios = statementsObj.ratios[0];  
     let price = statementsObj.price.companiesPriceList[0].price;
 
-    // example of object
+    // Object passed to value function
     var keyStatsCurrent = {
         "ROE(cf)": keyMetricsObj.freeCashFlowPerShare/keyMetricsObj.bookValuePerShare,
         "ROE(deps)": incomeObj.epsdiluted/keyMetricsObj.bookValuePerShare,
@@ -116,7 +117,8 @@ function prepCurrent(obj){
         "ROC(deps)": (incomeObj.epsdiluted*incomeObj.weightedAverageShsOutDil)/(balanceObj.longTermDebt + balanceObj.totalEquity ),
         "EV/Ebitda": keyMetricsObj.enterpriseValueOverEBITDA,
         "FreeCashFlow": ratios.freeCashFlowPerShare,
-        "Price": price
+        "Price": price,
+        "dilutedEPS": incomeObj.epsdiluted
     }
 
     console.log("current stats", keyStatsCurrent);
@@ -197,37 +199,19 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         probabalisticValuations[Object.keys(probabalisticValuations)[i]] = valuationObj;
     }
 
-    return probabalisticValuations
+    return probabalisticValuations;
 
-
-    // let valuationObj = {};
-
-    // let futureMetric = calcFutureValue(metric,growthRate, years);
-    // let terminalMultiple = calcTerminalMultiple(beta, erp, rfr);
-    // let futurePrice = calcFuturePrice(futureMetric, terminalMultiple);
-    // let fairValueRate = 1/(calcTerminalMultiple(beta,erp, rfr));
+    /*
+    return {
+        probabilisticSingleValues = {},
+        scenarios = [[bestprob, {}], [normalprob, {}],[worstProb, {}]]
+    }
     
-    // valuationObj.futurePrice = futurePrice;
-    // valuationObj.futureMetric = futureMetric;
-    // valuationObj.terminalMultiple = terminalMultiple;
-    // valuationObj.compoundedReturnCurrent = calcCompoundRate(futurePrice, currentPrice, years );
-    // valuationObj.buyPrice = calcPresentValue(futurePrice, .15, years);
-    // valuationObj.fairValue = calcPresentValue(futurePrice, fairValueRate, years);
-    
-
-    // console.log("valuation obj = ", valuationObj);
-    // return valuationObj;
+    */
 
 }
 
 //========== Where the actual work happens ====================
-/*var fetched = fetch("now");
-var keyStats= prepCurrent(fetched);
-template(keyStats);
-
-template(value(keyStats["FreeCashFlow"], 10, .04, 1.35, 689.06, keyStats["ROC(cf)"]*.7, .05, .05 ));
-*/
-
 function analyze(){
     let form = document.querySelector("form");
     let processingObj = {};
@@ -242,10 +226,22 @@ function analyze(){
     console.log(processingObj);
 
     var ticker = processingObj.ticker;
+    
+    // returns financial statements obj;
 
-    var fetched = fetch(ticker);
-    var keyStats= prepCurrent(fetched);
+    //****** comment out for test case********
+    //var fetched = fetch(ticker);
+    var fetched = sample;
 
+    /*Takes value from statements object and makes it into usable properties in one
+        object for display and "value()" function;
+     */
+    
+    var keyStats = prepCurrent(fetched);
+
+
+
+    // Sets up the values to pass to value the company;
     var valuationLabel = processingObj.valuationMetric; // add entry into key stats object to include Diluted eps start value ... like freecashflow.
     var years = Number(processingObj.years);
     var valuationMetric = Number(keyStats[valuationLabel]);
@@ -258,19 +254,13 @@ function analyze(){
     var bestGrowth = Number(processingObj.bestGrowth);
     var normalGrowth = Number(processingObj.normalGrowth);
     var worstGrowth = Number(processingObj.worstGrowth);
-
     var growthCaseScenarios = [bestGrowth, normalGrowth, worstGrowth];
-
     var desiredReturn = Number(processingObj.desiredReturn);
-
     var probabilities = [processingObj.bestProb, processingObj.normalProb, processingObj.worstProb]
 
-
-
-    
+    // Display the raw data on the page
     template(keyStats);
     template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
-    
 
 }
 
@@ -278,23 +268,18 @@ function analyze(){
 
 /*
 Next  long term steps;
-    - build the option to use the specific metric values (cashflow or eps)
     - build in option to set own expected grwoth rate
     - build in option to specify dilution and buybacks.
-    - build the option to output multiple scenarios (good normal bad) with specific probs
+    ++++- build the option to handle multiple scenarios (good normal bad), with specific probs, and determine single buy price and expected return (value function)
+    ++- option to display the single and multiple scenarios on screen from above change. (template function - handle nested objects.)
+        +- edit template function to remove previous output valuations if the submit button is clicked again.
     - add in error handling
     - build in handling of negative values.
     - build in functionality to show average return ratios for last 5 yrs
-    - eleminate all the fucntion declarations in value object... set vals as params
     - make pretty
     - build to use cash from operations, and to set the expected capex percentage.
     - add functionality to remove the elements on page if any when running another valuation
-
-
-    Immediate Next steps:
-        - add capability to use diluted eps.  see notes on line 249
-        - add functionailty to consolidate scenarios into one buy price and display .
-        - add to template function a check to see if the key contains an object and display that 
-            - to fix the [object object] showing for scenarios.
-
+    - clean up keystats object names
+    +++- add functionality to return keystats after adding ticker that can be used for second half of valuation (add other useful things to fill in values)
+    +- add functionality to fetch rates to inform risk free rate value in form
 */
