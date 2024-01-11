@@ -165,40 +165,31 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
 
     let consolidate = function(scenarios, probabilities){
         var combined = {};
-        
-
-        //get keys
         var keys = [];
-        let values = [];
-        var probParts = [];
-
 
         // get the keys and store then in an array
         for(key in scenarios[0]){
             keys.push(key);
         }
-        //============ FINISH HERE===============
-        //for each key grab all the scenarios key values are store then in the values array (2d array)
+        //============ FINISH HERE.. why only returning two?===============
         for (let i=0; i < keys.length -1 ; i++){
+           
             let keysVal = [];
+           
             for (let j=0; j < scenarios.length -1 ; j++){
-                keysVal.push(scenarios[i][keys[i]]);
+                keysVal.push(scenarios[j][keys[i]]);
                 
             }
-            values.push(keysVal);
+            //values.push(keysVal);
+            let keysValBestPart = keysVal[0] * probabilities[0];
+            let keysValNormal = keysVal[1] * probabilities[1];
+            let keysValWorst = keysVal[2] * probabilities[2];
+
+            let keysValConsolidated = keysValBestPart + keysValNormal + keysValWorst; 
+            combined[keys[i]] = keysValConsolidated;
         }
-
-        for (prob in probabilities){
-            for (let i = 0; i< values.length - 1; i++ ){
-
-                //test case
-                console.log(values[i]);
-
-
-            }
-        }
-
-        
+        return combined;
+          
     }
 
 
