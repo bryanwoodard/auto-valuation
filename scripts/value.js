@@ -163,11 +163,48 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         return (Math.pow((futurePrice/currentPrice), (1/years)) - 1);
     }
 
-    var probabalisticValuations = {
-        best:{},
-        normal:{},
-        worst:{}
-    };
+    let consolidate = function(scenarios, probabilities){
+        var combined = {};
+        
+
+        //get keys
+        var keys = [];
+        let values = [];
+        var probParts = [];
+
+
+        // get the keys and store then in an array
+        for(key in scenarios[0]){
+            keys.push(key);
+        }
+        //============ FINISH HERE===============
+        //for each key grab all the scenarios key values are store then in the values array (2d array)
+        for (let i=0; i < keys.length -1 ; i++){
+            let keysVal = [];
+            for (let j=0; j < scenarios.length -1 ; j++){
+                keysVal.push(scenarios[i][keys[i]]);
+                
+            }
+            values.push(keysVal);
+        }
+
+        for (prob in probabilities){
+            for (let i = 0; i< values.length - 1; i++ ){
+
+                //test case
+                console.log(values[i]);
+
+
+            }
+        }
+
+        
+    }
+
+
+
+
+    var probabalisticValuations = [];
 
     for (var i = 0; i<growthCaseScenarios.length; i++ ){
         // return 3 valuation objects in one object.
@@ -195,11 +232,14 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         valuationObj.growthRateOfMetric = growthRate * growthCaseScenarios[i];
         
 
-        console.log(`${Object.keys(probabalisticValuations)[i]} scenario = `, valuationObj);
-        probabalisticValuations[Object.keys(probabalisticValuations)[i]] = valuationObj;
+        console.log(`scenario ${i} = `, valuationObj);
+        probabalisticValuations.push(valuationObj);
     }
+    let singularScenario = consolidate(probabalisticValuations, probabilities);
 
-    return probabalisticValuations;
+    let combinedScenarios = {singularScenario, probabalisticValuations}
+
+    return combinedScenarios;
 
     /*
     return {
