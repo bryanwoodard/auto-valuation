@@ -171,7 +171,6 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         for(key in scenarios[0]){
             keys.push(key);
         }
-        //============ FINISH HERE.. why only returning two?===============
         for (let i=0; i < keys.length ; i++){
            
             let keysVal = [];
@@ -227,17 +226,9 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
 
     let combinedScenarios = {singularScenario, probabalisticValuations}
 
-    console.log("Combined Scenario = ", combinedScenarios);
+    console.log("Combined Scenario = ", combinedScenarios );
 
     return combinedScenarios;
-
-    /*
-    return {
-        probabilisticSingleValues = {},
-        scenarios = [[bestprob, {}], [normalprob, {}],[worstProb, {}]]
-    }
-    
-    */
 
 }
 
