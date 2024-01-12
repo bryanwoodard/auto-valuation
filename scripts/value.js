@@ -172,11 +172,11 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
             keys.push(key);
         }
         //============ FINISH HERE.. why only returning two?===============
-        for (let i=0; i < keys.length -1 ; i++){
+        for (let i=0; i < keys.length ; i++){
            
             let keysVal = [];
            
-            for (let j=0; j < scenarios.length -1 ; j++){
+            for (let j=0; j < scenarios.length; j++){
                 keysVal.push(scenarios[j][keys[i]]);
                 
             }
@@ -191,9 +191,6 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
         return combined;
           
     }
-
-
-
 
     var probabalisticValuations = [];
 
@@ -229,6 +226,8 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
     let singularScenario = consolidate(probabalisticValuations, probabilities);
 
     let combinedScenarios = {singularScenario, probabalisticValuations}
+
+    console.log("Combined Scenario = ", combinedScenarios);
 
     return combinedScenarios;
 
