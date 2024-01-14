@@ -1,22 +1,4 @@
-/*Template engine
-sample obj
-let data = [
-	{
-		"symbol": "AAPL",
-		"revenuePerShare": 24.31727304755197,
-		"netIncomePerShare": 6.154614437637777,
-		"operatingCashFlowPerShare": 7.532762624088375,
-		"freeCashFlowPerShare": 6.872425646259799,
-		"cashPerShare": 2.9787931805221803
-		
-	}
-]
-
-
-*/
-
-
-
+//template objects
 let template = (obj)=>{
     
     let element = ``;
@@ -39,6 +21,29 @@ let template = (obj)=>{
         parentDiv.appendChild(node).appendChild(content);
 
     };
+}
+
+//from validation
+let validate = function (){
+    let fields = document.querySelectorAll("form input");
+   
+    for(let i = 0; i<fields.length ; i++){
+        if(fields[i].value == false){
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+
+function pullKeyStats(){
+
+    //****** comment out for test case********
+    var fetched = fetch(this.value);
+    //var fetched = sample;
+    window.keyStats = prepCurrent(fetched);
+    template(keyStats);
 }
 
 
@@ -234,6 +239,11 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
 
 //========== Where the actual work happens ====================
 function analyze(){
+
+    if (validate() == false){
+        return alert("Please ensure all value are filled in");
+    }
+
     let form = document.querySelector("form");
     let processingObj = {};
 
@@ -245,21 +255,6 @@ function analyze(){
     }
     
     console.log(processingObj);
-
-    var ticker = processingObj.ticker;
-    
-    // returns financial statements obj;
-
-    //****** comment out for test case********
-    //var fetched = fetch(ticker);
-    var fetched = sample;
-
-    /*Takes value from statements object and makes it into usable properties in one
-        object for display and "value()" function;
-     */
-    
-    var keyStats = prepCurrent(fetched);
-
 
 
     // Sets up the values to pass to value the company;
@@ -280,7 +275,6 @@ function analyze(){
     var probabilities = [processingObj.bestProb, processingObj.normalProb, processingObj.worstProb]
 
     // Display the raw data on the page
-    template(keyStats);
     template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
 
 }
@@ -291,9 +285,6 @@ function analyze(){
 Next  long term steps;
     - build in option to set own expected grwoth rate
     - build in option to specify dilution and buybacks.
-    ++++- build the option to handle multiple scenarios (good normal bad), with specific probs, and determine single buy price and expected return (value function)
-    ++- option to display the single and multiple scenarios on screen from above change. (template function - handle nested objects.)
-        +- edit template function to remove previous output valuations if the submit button is clicked again.
     - add in error handling
     - build in handling of negative values.
     - build in functionality to show average return ratios for last 5 yrs
@@ -301,6 +292,21 @@ Next  long term steps;
     - build to use cash from operations, and to set the expected capex percentage.
     - add functionality to remove the elements on page if any when running another valuation
     - clean up keystats object names
-    +++- add functionality to return keystats after adding ticker that can be used for second half of valuation (add other useful things to fill in values)
     +- add functionality to fetch rates to inform risk free rate value in form
+
+    Immediate:
+    
+
+    +- edit template function to remove previous output valuations if the submit button is clicked again.
+        - also make template function easier i.e
+            - create new elements
+            - loop over scenarios
+
+    Complete:
+        xxx+++- add functionality to return keystats after adding ticker that can be used for second half of valuation (add other useful things to fill in values)
+        xxx+++ add functionality to recalc with the same ticker to reduce network requests.  
+            - set a global variable and check if it exists and is the same or something
+        xxxx+++ add functionality to enforce mandatory values before submission.
+
+
 */

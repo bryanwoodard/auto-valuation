@@ -9,9 +9,6 @@
             <h1>Valuation Tool</h1>
         </div>
 
-
-
-        metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate
         <div id = "form">
             <form>
                 <label for="symbol">Symbol:</label>
@@ -62,14 +59,20 @@
                 <input type="button" value="Submit" onclick="analyze()">
                 
             </form>
+            <script src="sampleobj.js"></script>
+            <script src="scripts/rates.js"></script>
+            <script src="scripts/value.js"></script>
+            <script>
+
+                document.getElementById("ticker").addEventListener("change", pullKeyStats);
+
+            </script>
         </div>
 
     </body>
 
     <footer>
-        <script src="sampleobj.js"></script>
-        <script src="scripts/rates.js"></script>
-        <script src="scripts/value.js"></script>
+        
         
     </footer>
 </html>
