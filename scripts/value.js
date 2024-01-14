@@ -283,7 +283,6 @@ function analyze(){
 
 /*
 Next  long term steps;
-    - build in option to set own expected grwoth rate
     - build in option to specify dilution and buybacks.
     - add in error handling
     - build in handling of negative values.
@@ -292,21 +291,15 @@ Next  long term steps;
     - build to use cash from operations, and to set the expected capex percentage.
     - add functionality to remove the elements on page if any when running another valuation
     - clean up keystats object names
-    +- add functionality to fetch rates to inform risk free rate value in form
+    - add functionality to fetch rates to inform risk free rate value in form
 
-    Immediate:
-    
-
-    +- edit template function to remove previous output valuations if the submit button is clicked again.
-        - also make template function easier i.e
-            - create new elements
-            - loop over scenarios
-
-    Complete:
-        xxx+++- add functionality to return keystats after adding ticker that can be used for second half of valuation (add other useful things to fill in values)
-        xxx+++ add functionality to recalc with the same ticker to reduce network requests.  
-            - set a global variable and check if it exists and is the same or something
-        xxxx+++ add functionality to enforce mandatory values before submission.
+    Immediate: 
+    + edit template function to 
+        - add to side of form to display 1)combined output and 2)scenarios (all 3)
+        - remove previously output valuations, and keystats obj if the submit button is clicked again or ticker changes.
+    + use wacc instead of just cost of equity
+    + factor in dividends to the compound return obj (maybe yield+growth? see how done in valuation workbook )
+    + add 5 yr avg's to key stats obj
 
 
 */
