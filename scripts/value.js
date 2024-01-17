@@ -34,7 +34,7 @@ const newTemplate = function(divId, object){
     
     let location = document.getElementById(divId);
     
-    function createElement(key, object){
+    function createElement(key){
         let newElement = document.createElement("p");
         newElement.innerText = `${makeWords(key)}: ${object[key]}`;
         location.append(newElement);
@@ -68,7 +68,8 @@ function pullKeyStats(){
     var fetched = fetch(this.value);
     //var fetched = sample;
     window.keyStats = prepCurrent(fetched);
-    template(keyStats);
+    //template(keyStats);
+    newTemplate("quick-stats", keyStats );
 }
 // Grabs all of the statements into one big obj
 function fetch(symbol){
@@ -255,7 +256,11 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
 
     console.log("Combined Scenario = ", combinedScenarios );
 
-    return combinedScenarios;
+    //return combinedScenarios;
+    newTemplate("consolidated", singularScenario );
+    newTemplate("best", probabalisticValuations[0] );
+    newTemplate("neutral", probabalisticValuations[1] );
+    newTemplate("worst", probabalisticValuations[2] );
 
 }
 //========== Where the actual work happens ====================
@@ -296,7 +301,8 @@ function analyze(){
     var probabilities = [processingObj.bestProb, processingObj.normalProb, processingObj.worstProb]
 
     // Display the raw data on the page
-    template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
+    //template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
+    value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities );
 
 }
 
