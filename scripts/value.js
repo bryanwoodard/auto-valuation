@@ -23,7 +23,33 @@ let template = (obj)=>{
     };
 }
 
-//from validation
+const newTemplate = function(divId, object){
+    
+    function makeWords(varName){
+        const text = varName;
+        const result = text.replace(/([A-Z])/g, " $1");
+        const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+        return finalResult;
+    }
+    
+    let location = document.getElementById(divId);
+    
+    function createElement(key, object){
+        let newElement = document.createElement("p");
+        newElement.innerText = `${makeWords(key)}: ${object[key]}`;
+        location.append(newElement);
+    }
+
+    //// continue here>> test and integrate into other functions
+    for (key in object){
+        createElement(key);
+    }
+
+
+
+}
+
+//form validation
 let validate = function (){
     let fields = document.querySelectorAll("form input");
    
@@ -36,7 +62,6 @@ let validate = function (){
     }
 }
 
-
 function pullKeyStats(){
 
     //****** comment out for test case********
@@ -45,10 +70,7 @@ function pullKeyStats(){
     window.keyStats = prepCurrent(fetched);
     template(keyStats);
 }
-
-
-// functions to fetch and retrieve the object.
-    // Grabs all of the statements into one big obj
+// Grabs all of the statements into one big obj
 function fetch(symbol){
 
     function grab(statement){
@@ -236,7 +258,6 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, termina
     return combinedScenarios;
 
 }
-
 //========== Where the actual work happens ====================
 function analyze(){
 
@@ -278,6 +299,8 @@ function analyze(){
     template(value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities ));
 
 }
+
+
 
 
 
