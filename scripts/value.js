@@ -300,6 +300,8 @@ Next  long term steps;
     + use wacc instead of just cost of equity
     + factor in dividends to the compound return obj (maybe yield+growth? see how done in valuation workbook )
     + add 5 yr avg's to key stats obj
+    + add tool tips
+    + add intro
 
 
 */
