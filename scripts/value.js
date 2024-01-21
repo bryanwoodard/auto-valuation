@@ -27,26 +27,35 @@ const newTemplate = function(divId, object){
     
     function makeWords(varName){
         const text = varName;
-        const result = text.replace(/([A-Z])/g, " $1");
+        const result = text.replace(/([A-Z])/g, "$1");
         const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
         return finalResult;
     }
     
     let location = document.getElementById(divId);
     
+    if (location.childNodes){
+        location.innerHTML= null;
+    }
+
     function createElement(key){
         let newElement = document.createElement("p");
-        newElement.innerText = `${makeWords(key)}: ${object[key]}`;
+        var value = object[key];
+        
+        if(/*object[key] < 1 &&*/ key.includes("RO") || key.includes("return")|| key.includes("rate")){
+            value = value * 100
+            value = value.toFixed(2) + "%";
+        } else {
+            value = value.toFixed(2);
+        }
+
+        newElement.innerText = `${makeWords(key)}: ${value}`;
         location.append(newElement);
     }
 
-    //// continue here>> test and integrate into other functions
     for (key in object){
         createElement(key);
     }
-
-
-
 }
 
 //form validation
