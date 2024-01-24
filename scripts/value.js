@@ -58,6 +58,7 @@ const newTemplate = function(divId, object){
     }
 }
 
+
 //form validation
 let validate = function (){
     let fields = document.querySelectorAll("form input");
@@ -173,7 +174,8 @@ function prepCurrent(obj){
         - get the fair value based on the current expectations when return is equal to wacc
 
 */
-function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities){
+function value(metric, years, erp, beta,  currentPrice, growthRate, rfr, 
+    terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities){
 
 
     let calcFutureValue = function(metric, growthRate, years){
