@@ -1,28 +1,3 @@
-//template objects
-let template = (obj)=>{
-    
-    let element = ``;
-    let bodyElement = document.getElementsByTagName("body")[0];
-    let parentDiv = document.createElement("div");
-    bodyElement.appendChild(parentDiv);
-    
-    for (let key in obj){
-        //debugger;
-        let shortNum;
-        if(typeof obj[key] == "number"){
-            shortNum = obj[key].toString().substring(0,4); 
-        } else{
-            shortNum = obj[key];
-        }
-        element = element + `${key} : ${shortNum} \n`;
-
-        let node = document.createElement("p");
-        let content = document.createTextNode(`${key} : ${shortNum} \n`);
-        parentDiv.appendChild(node).appendChild(content);
-
-    };
-}
-
 const newTemplate = function(divId, object){
     
     function makeWords(varName){
@@ -58,7 +33,6 @@ const newTemplate = function(divId, object){
     }
 }
 
-
 //form validation
 let validate = function (){
     let fields = document.querySelectorAll("form input");
@@ -83,15 +57,25 @@ function pullKeyStats(){
 }
 // Grabs all of the statements into one big obj
 function fetch(symbol){
+    var statementsObj = {};
+    let apiKey = "apikey=Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
+    let statements = ["income-statement", 
+        "balance-sheet-statement", 
+        "cash-flow-statement", 
+        "key-metrics",
+        "ratios",
+        "price"
+    ];
+
+    statements.forEach(grab);
+    return statementsObj;
 
     function grab(statement){
         if(statement == "price"){
             var apiURL = `https://financialmodelingprep.com/api/v3/stock/real-time-price/${symbol}?${apiKey}`;
         }else{
             var apiURL = `https://financialmodelingprep.com/api/v3/${statement}/${symbol}?period=annual&${apiKey}`;
-        }
-
-        
+        }     
         let xhr = new XMLHttpRequest();
         xhr.open("GET", apiURL, false);
         xhr.onload = function() {
@@ -117,22 +101,10 @@ function fetch(symbol){
                 console.log("bad request");
             }
         };
-    
         xhr.send();
-        
     } 
     
-    var statementsObj = {};
-    let apiKey = "apikey=Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
-    let statements = ["income-statement", 
-        "balance-sheet-statement", 
-        "cash-flow-statement", 
-        "key-metrics",
-        "ratios",
-        "price"
-    ];
-    statements.forEach(grab);
-    return statementsObj;
+    
 }
 //take the statements that are fetched and transform them into a flat simple obj
 function prepCurrent(obj){
@@ -274,7 +246,7 @@ function value(metric, years, erp, beta,  currentPrice, growthRate, rfr,
     newTemplate("worst", probabalisticValuations[2] );
 
 }
-//========== Where the actual work happens ====================
+
 function analyze(){
 
     if (validate() == false){
@@ -316,6 +288,7 @@ function analyze(){
     value(valuationMetric, years, erp, beta, price, growthRate, rfr, terminalGrowthRate, growthCaseScenarios, desiredReturn, probabilities );
 
 }
+
 
 
 
