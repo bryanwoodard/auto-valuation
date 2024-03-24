@@ -1,4 +1,5 @@
 //generic list type ADT
+// Uses as the base for most other classes
 
 export default class Base {
     constructor(type){
