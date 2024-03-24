@@ -1,4 +1,4 @@
-const newTemplate = function(divId, object){
+function newTemplate (divId, object){
     
     function makeWords(varName){
         const text = varName;
@@ -34,7 +34,7 @@ const newTemplate = function(divId, object){
 }
 
 //form validation
-let validate = function (){
+function validate (){
     let fields = document.querySelectorAll("form input");
    
     for(let i = 0; i<fields.length ; i++){

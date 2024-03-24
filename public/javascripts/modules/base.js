@@ -1,7 +1,8 @@
 //generic list type ADT
 
-class Base{
-    constructor(){
+export default class Base {
+    constructor(type){
+        this.type = type
         this.listSize = 0;
         this.pos = 0;
         this.data = [];
@@ -25,11 +26,11 @@ class Base{
     }
 }
 
-function append(element){
+export function append(element){
     this.data[this.listSize++] = element;
 }
 
-function find(element){
+export function find(element){
     for (var i=0; i <this.data.length; ++i){
         if (this.data[i] == element){
             return i;
@@ -38,7 +39,7 @@ function find(element){
     return -1;
 }
 
-function remove(element){
+export function remove(element){
     var foundAt = this.find(element);
     if (foundAt > -1){
         this.data.splice(foundAt, 1);
@@ -48,15 +49,15 @@ function remove(element){
     return false;
 }
 
-function length(){
+export function length(){
     return this.listSize;
 }
 
-function toString(){
+export function toString(){
     return this.data;
 }
 
-function insert(element, after){
+export function insert(element, after){
     var insertPos = this.find(after);
     if (insertPos > -1){
         this.data.splice(insertPos+1, 0, element);
@@ -66,13 +67,13 @@ function insert(element, after){
     return false;
 }
 
-function clear(){
+export function clear(){
     delete this.data;
     this.data = [];
     this.listSize = this.pos = 0;
 }
 
-function contains(element){
+export function contains(element){
     for(var i = 0; i<this.data.length; ++i){
         if (this.data[i] == element){
             return true
@@ -81,40 +82,36 @@ function contains(element){
     return false;
 }
 
-function front(){
+export function front(){
     this.pos = 0;
 }
 
-function end(){
+export function end(){
     this.pos = this.listSize -1;
 }
 
-function prev(){
+export function prev(){
     if (this.pos > 0){
         --this.pos;
     }
 }
 
-function next(){
+export function next(){
     if (this.pos < this.listSize-1 ){
         ++this.pos;
     }
 }
 
-function currPos(){
+export function currPos(){
     return this.pos;
 }
 
-function moveTo(position){
+export function moveTo(position){
     this.pos = position;
 }
 
-function getElement(){
+export function getElement(){
     return this.data[this.pos];
 }
-
-export {Base};
-
-
 
 
