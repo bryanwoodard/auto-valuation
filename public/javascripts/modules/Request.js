@@ -9,20 +9,23 @@ export class Request extends Base{
         this.urlStem = `https://financialmodelingprep.com/api/v3/`;
         this.priceURL = this.urlStem + `stock/real-time-price/${symbol}?apikey=${this.apiKey}`;
         this.statementUrl = this.urlStem +`${item}/${symbol}?period=annual&apikey=${this.apiKey}`;
+        this.dcfUrl = `https://financialmodelingprep.com/api/v4/advanced_discounted_cash_flow?symbol=${symbol}&apikey=${this.apiKey}`
         this.getData =  getData;
 
-        return getData.call(this, symbol,item);
+        return getData.call(this, symbol, item);
     }
 }
 
 
-async function getData (symbol, item){
+async function getData (symbol, item, place){
     const statements = ["income-statement", 
     "balance-sheet-statement", 
     "cash-flow-statement", 
     "key-metrics",
     "ratios",
-    "price"
+    "price",
+    "financial-growth",
+    "advanced_discounted_cash_flow"
     ];
 
     if(!item){
@@ -38,44 +41,28 @@ async function getData (symbol, item){
     let choiceURl = "";
     if(item == "price"){
         choiceURl = this.priceURL;
+    } else if (item == "advanced_discounted_cash_flow" ){
+        choiceURl = this.dcfUrl;
     } else {
         choiceURl = this.statementUrl;
     }
 
     try{
-        console.log("trying the request");
+        console.log("trying the request for " + item);
         
         let response = await fetch(choiceURl);
         let data =  await response.json();
         console.log(data);
                        
+        if(item == "price"){
+            data = data.companiesPriceList[0].price;
+        }
+
         return data;
         
     }catch(e){
-        console.error(`Something went wrong with the request. See ${e}`);
+        alert(`${symbol} does not look to be a valid symbol.  Please try again`)
+        console.error(`Something went wrong with the request. See: ${e}`);
     }
     
 }
-
-
-/*
-why the fuck does this work but not the above:
-
-var reqs = async function (symbol, item){
- 	apiKey = "Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
-    urlStem = `https://financialmodelingprep.com/api/v3/`;
-    priceURL = urlStem + `stock/real-time-price/${symbol}?apikey=${apiKey}`;
-    statementUrl = urlStem +`${item}/${symbol}?period=annual&apikey=${apiKey}`;
-
-    let response = await fetch(priceURL);
-    let data =  await response.json();
-
-    return data
-
-}
-
-var t = await reqs("now", "price");
-
-console.log(t)
-
-*/

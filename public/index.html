@@ -12,7 +12,7 @@
         <div id = "form">
             <form>
                 <label for="symbol">Symbol:</label>
-                <input type="text" id="ticker" name="" >
+                <input type="text" id="ticker" name="" autocapitalize="characters" >
                 <br>
                 <label for="years"># of Years:</label>
                 <input type="number" id="years" name="" >
@@ -52,11 +52,11 @@
                 <br>
                 <label for="valuation-metric">Valuation Metric:</label>
                 <select id="valuationMetric" name="valuationMetric">
-                    <option value="FreeCashFlow">Free Cash Flow</option>
-                    <option value="dilutedEPS">Diluted Eps</option>
+                    <option value="fcf">Free Cash Flow</option>
+                    <option value="ni">Earnings Per Share</option>
                 </select>
                 <br>
-                <input type="button" value="Submit" onclick="analyze()">
+                <input type="button" value="Submit" id="submit" >
 
                 <div id="quick-stats">
                     <!-- <p id="buyPrice"></p>
