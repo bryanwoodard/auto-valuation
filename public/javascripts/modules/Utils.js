@@ -63,9 +63,7 @@ export const Utils = {
         statements.financialGrowth = await new AVclass.Classes.Request(symbol, "financial-growth");
         statements.dcf = await new AVclass.Classes.Request(symbol, "advanced_discounted_cash_flow");
 
-
         //===== Set up and set Data In the Object.
-
         var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
         var netIncome = statements.incomeStatements[0].netIncome;
 
@@ -77,16 +75,13 @@ export const Utils = {
         financials.expectedGrowthCF = operatingCashFlow / totalCapital ;
         financials.expectedGrowthNI = netIncome/ totalCapital ;
 
-        Utils.buildDisplay()
+        Utils.buildDisplay();
 
     },
     buildDisplay: function(){
         console.log("this is the function we will use to display stuff");
-
-
-
-
         
+
     }, 
     process: function(){
         if (Utils.validate() == false){
