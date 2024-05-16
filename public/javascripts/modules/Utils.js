@@ -74,12 +74,31 @@ export const Utils = {
 
         financials.expectedGrowthCF = operatingCashFlow / totalCapital ;
         financials.expectedGrowthNI = netIncome/ totalCapital ;
+        financials.sharesOutstanding = statements.dcf[0].dilutedSharesOutstanding;
 
         Utils.buildDisplay();
 
     },
     buildDisplay: function(){
         console.log("this is the function we will use to display stuff");
+
+        const dict = AVclass.Dictionary;
+
+        const statements = AVclass.financials.statements
+        var displayObj = {
+            current_price : statements.price,
+            earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
+            free_cash_flow_per_share: statements.keyMetrics[0].freeCashFlowPerShare,
+            earnings_growth_five_years: dict.getRoR(statements.keyMetrics[0].netIncomePerShare, statements.keyMetrics[5].netIncomePerShare, 5),
+            fcf_growth_five_years: dict.getRoR(statements.keyMetrics[0].freeCashFlowPerShare, statements.keyMetrics[5].freeCashFlowPerShare, 5),
+            current_dividend_yield: statements.keyMetrics[0].dividendYield,
+            fcf_return_on_capital_adjusted: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            return_on_capital_listed: statements.keyMetrics[0].roic,
+            return_on_equity_listed: statements.keyMetrics[0].roe,
+        };
+        
+        AVclass.displayData = displayObj;
         
 
     }, 

@@ -3,7 +3,7 @@
 export const Dictionary = {
 
     getRoR: function(futureValue, presentValue, years){
-        return Math.pow(futureValue/presentValue, 1/years);
+        return Math.pow(futureValue/presentValue, 1/years) - 1;
     },
     getPresentValue : function (futureValue, rateOfReturn, years){
         return futureValue/(Math.pow((1+rateOfReturn), years));
@@ -29,7 +29,7 @@ export const Dictionary = {
 
         var averages = fields.map(calculate, arr);
 
-        var obj = {};
+        //var obj = {};
 
         return averages;
 
@@ -38,21 +38,58 @@ export const Dictionary = {
             
             for (var i = 0; i < limit ; i++ ){
                 if (!this[i][param]) return false;
-                
                 newArr.push(this[i][param]);
             }
             
-            var sum = newArr.reduce(reducer)
+            var sum = newArr.reduce(reducer);
+
+            var obj = {};
+            obj[param] = (sum/limit) ;
+
+            return obj;
 
             function reducer(total, num){
                 return total + num;
             }
             
-            var obj = {};
-            obj[param] = (sum/limit) ;
-
-            return obj;
+            
         }    
+    },
+    //FIX ME -- THIS IS WRONG
+    getAdjRoC: function(balanceSheet, type, metrics){
+        const debt = balanceSheet.longTermDebt + balanceSheet.shortTermDebt
+        //check for accuracy.
+        var treasuryStock = balanceSheet.preferredStock;
+        const equity =  balanceSheet.totalEquity
+        const totalCapital = debt + equity + treasuryStock;
+        const sharesOut = AVclass.financials.sharesOutstanding;
+
+
+        let value;
+        if(type == "fcf"){
+            value = metrics.freeCashFlowPerShare
+        }else{
+            value = metrics.netIncomePerShare
+        }
+        return value/(totalCapital/sharesOut);
+
+    },
+    //FIX ME -- THIS IS WRONG
+    getAdjRoE: function(balanceSheet, type, metrics){
+        //const debt = balanceSheet.longTermDebt + balanceSheet.shortTermDebt
+        //check for accuracy.
+        const equity = balanceSheet.preferredStock + balanceSheet.totalEquity
+        //const totalCapital = debt + equity;
+        const sharesOut = AVclass.financials.sharesOutstanding;
+
+        let value;
+        if(type == "fcf"){
+            value = metrics.freeCashFlowPerShare
+        }else{
+            value = metrics.netIncomePerShare
+        }
+        return value/(equity/sharesOut);
+
     }
 
 
