@@ -70,7 +70,8 @@ export const Utils = {
         var totalEquity = statements.balanceSheets[0].totalStockholdersEquity;
         var totalDebt = statements.balanceSheets[0].longTermDebt + statements.balanceSheets[0].shortTermDebt;
         var treasuryStock = statements.balanceSheets[0].preferredStock;
-        var totalCapital = totalEquity + totalDebt + treasuryStock;
+        var capitalLeases = statements.balanceSheets[0].capitalLeaseObligations;
+        var totalCapital = totalEquity + totalDebt + treasuryStock + capitalLeases;
 
         financials.expectedGrowthCF = operatingCashFlow / totalCapital ;
         financials.expectedGrowthNI = netIncome/ totalCapital ;

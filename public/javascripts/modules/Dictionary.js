@@ -55,13 +55,13 @@ export const Dictionary = {
             
         }    
     },
-    //FIX ME -- THIS IS WRONG
     getAdjRoC: function(balanceSheet, type, metrics){
         const debt = balanceSheet.longTermDebt + balanceSheet.shortTermDebt
         //check for accuracy.
         var treasuryStock = balanceSheet.preferredStock;
-        const equity =  balanceSheet.totalEquity
-        const totalCapital = debt + equity + treasuryStock;
+        const equity =  balanceSheet.totalEquity;
+        const capitalLeases = balanceSheet.capitalLeaseObligations;
+        const totalCapital = debt + equity + treasuryStock + capitalLeases;
         const sharesOut = AVclass.financials.sharesOutstanding;
 
 
@@ -74,7 +74,6 @@ export const Dictionary = {
         return value/(totalCapital/sharesOut);
 
     },
-    //FIX ME -- THIS IS WRONG
     getAdjRoE: function(balanceSheet, type, metrics){
         //const debt = balanceSheet.longTermDebt + balanceSheet.shortTermDebt
         //check for accuracy.
