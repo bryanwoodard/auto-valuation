@@ -8,19 +8,19 @@ export class Valuation {
         this.growthCaseScenarios = valuationData.growthCaseScenarios;
         this.probabilities = valuationData.probabilities;
         this.terminalGrowthRate = valuationData.terminalGrowthRate;
-        this.years = years;
+        this.years = valuationData.years;
         this.valuationBasis = valuationData.valuationBasis;
         this.riskFreeRate = valuationData.riskFreeRate;
-        this.price = AVclass.price;
-        this.fcfShare = AVclass.keyMetrics.freeCashFlowPerShare;
-        this.niPerShare = AVclass.keyMetrics.netIncomePerShare;
-        this.equityPercentage = AVclass.dcf[0].equityWeighting;
-        this.debtPercentage = AVclass.dcf[0].debtWeighting;
-        this.costofDebt = AVclass.dcf[0].afterTaxCostOfDebt;
+        this.price = AVclass.displayData.current_price;
+        this.fcfShare = AVclass.financials.statements.keyMetrics[0].freeCashFlowPerShare;
+        this.niPerShare = AVclass.financials.statements.keyMetrics[0].netIncomePerShare;
+        this.equityPercentage = AVclass.financials.statements.dcf[0].equityWeighting / 100;
+        this.debtPercentage = AVclass.financials.statements.dcf[0].debtWeighting / 100;
+        this.costofDebt = AVclass.financials.statements.dcf[0].afterTaxCostOfDebt/100;
         this.costofEquity = AVclass.Dictionary.getCostOfEquity(this.riskFreeRate, this.beta, this.riskFreeRate);
         this.wacc = (this.costofEquity * this.equityPercentage) + (this.costofDebt * this.debtPercentage)
-        this.fvWacc = AVclass.dcf[0].wacc;
-        this.fvTerminalGrowthRate = AVclass.dcf[0].longTermGrowthRate;
+        this.fvWacc = AVclass.financials.statements.dcf[0].wacc / 100;
+        this.fvTerminalGrowthRate = AVclass.financials.statements.dcf[0].longTermGrowthRate / 100;
         this.metric = this.valuationBasis = "fcf" ? this.fcfShare : this.niPerShare
         
         //Functionality
@@ -54,7 +54,7 @@ const process = function(){
         //let costOfEquity = dict.getCostOfEquity(this.riskFreeRate, this.beta, this.riskFreeRate);
         
         //FIXME; DEFINE THE METRIC VALUE TO USE AS A START I.E THE FCF OR EPS NUMBER.
-        let futureMetric = dict.getFutureValue(this.metric, growthCaseScenarios[i], years);
+        let futureMetric = dict.getFutureValue(this.metric, this.growthCaseScenarios[i], this.years);
         let terminalMultiple = dict.getTerminalMultiple(this.beta, this.equityRiskPremium, this.riskFreeRate, this.terminalGrowthRate) * terminalModifier;
         let futurePrice = dict.getFuturePrice(futureMetric, terminalMultiple);
         let fvMultiple = 1/(this.fvWacc - this.fvTerminalGrowthRate);
@@ -66,7 +66,7 @@ const process = function(){
         valuationObj.compoundedReturnCurrent = dict.getRoR(futurePrice, this.price, this.years );
 
         valuationObj.buyPrice = dict.getPresentValue(futurePrice, this.desiredReturn, this.years); // add in factor to get desired return
-        valuationObj.fairValue = dict.getPresentValue(futurePrice, 1/fvMultiple, years);
+        valuationObj.fairValue = dict.getPresentValue(futurePrice, 1/fvMultiple, this.years);
         //valuationObj.growthRateOfMetric = growthRate * growthCaseScenarios[i];
         
 
@@ -74,7 +74,7 @@ const process = function(){
         probabalisticValuations.push(valuationObj);
     }
     
-    let singularScenario = consolidate.call( this, probabalisticValuations, probabilities);
+    let singularScenario = consolidate.call( this, probabalisticValuations, this.probabilities);
 
     let combinedScenarios = {singularScenario, probabalisticValuations}
 
@@ -90,7 +90,7 @@ const consolidate = function(scenarios, probabilities){
     var keys = [];
 
     // get the keys and store then in an array
-    for(key in scenarios[0]){
+    for(var key in scenarios[0]){
         keys.push(key);
     }
     for (let i=0; i < keys.length ; i++){

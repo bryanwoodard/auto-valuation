@@ -63,7 +63,7 @@ export const Utils = {
         statements.financialGrowth = await new AVclass.Classes.Request(symbol, "financial-growth");
         statements.dcf = await new AVclass.Classes.Request(symbol, "advanced_discounted_cash_flow");
 
-        //===== Set up and set Data In the Object.
+        //FIXME: This should be put in the display object. Doesnt make sense to be here.
         var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
         var netIncome = statements.incomeStatements[0].netIncome;
 
