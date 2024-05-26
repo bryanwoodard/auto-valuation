@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    </head>
+
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+        <div id="header" class="container text-center">
+            <h1>Valuation Tool</h1>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div id = "form" class="col">
+                    <h2>Input Params Below:</h2>
+                    <form>
+                        <label for="symbol">Symbol:</label>
+                        <input type="text" id="ticker" name="" autocapitalize="characters" >
+                        <br>
+                        <label for="years"># of Years:</label>
+                        <input type="number" id="years" name="" >
+                        <br>
+                        <label for="erp">Equity Risk Premium:</label>
+                        <input type="number" id="erp" name="" >
+                        <br>
+                        <label for="beta">Beta:</label>
+                        <input type="number" id="beta" name="" >
+                        <br>
+                        <label for="rfr">Risk Free Rate:</label>
+                        <input type="number" id="rfr" name="" >
+                        <br>
+                        <label for="tgr">Terminal Growth Rate:</label>
+                        <input type="number" id="tgr" name="" >
+                        <br>
+                        <label for="bestGrowth">Best Case Growth:</label>
+                        <input type="number" id="bestGrowth" name="" >
+                        <br>
+                        <label for="normalGrowth">Normal Case Growth:</label>
+                        <input type="number" id="normalGrowth" name="" >
+                        <br>
+                        <label for="worstGrowth">Worst case Growth:</label>
+                        <input type="number" id="worstGrowth" name="" >
+                        <br>
+                        <label for="bestProb">Best Case Scenario Prob:</label>
+                        <input type="number" id="bestProb" name="" >
+                        <br>
+                        <label for="normalProb">Normal Case Scenario Prob:</label>
+                        <input type="number" id="normalProb" name="" >
+                        <br>
+                        <label for="worstProb">Worst case Scenario Prob:</label>
+                        <input type="number" id="worstProb" name="" >
+                        <br>
+                        <label for="desiredReturn">Desired Return:</label>
+                        <input type="number" id="desiredReturn" name="" >
+                        <br>
+                        <label for="valuation-metric">Valuation Metric:</label>
+                        <select id="valuationMetric" name="valuationMetric">
+                            <option value="fcf">Free Cash Flow</option>
+                            <option value="ni">Earnings Per Share</option>
+                        </select>
+                        <br>
+                        <input type="button" value="Submit" id="submit" >
+                    </form>
+                    <script>
+                        //document.getElementById("ticker").addEventListener("change", pullKeyStats);
+                    </script>
+                </div>
+                
+                <div id = "quick-stats-head" class="col d-none">
+                    <h2>Quick Stats</h2>
+                    <div id="quick-stats">
+                    </div>
+                </div>
+                
+                <div id = "valuations" class="d-none col" >
+                    <div id="consolidated" class="row">
+                        <h2 >Consolidated</h2>
+                        <div id="consolidated-data" ></div>
+                    </div>
+
+                    <div id ="combined" class = "row ">
+                        <div id="best" class="col">
+                            <h3>Best Case</h3>
+                            <div id="best-data" class="col" ></div>  
+                        </div>
+
+                        <div id="neutral" class="col">
+                            <h3>Neutral Case</h3>
+                            <div id="neutral-data" class="col"></div>
+                        </div>
+
+                        <div id="worst" class="col">
+                            <h3>Worst Case</h3>
+                            <div id="worst-data" class="col"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+    <footer>
+        <script  type="module" src="javascripts/value_2.js"></script>
+    </footer>
+</html>
