@@ -1,5 +1,7 @@
+//I dont think this script is being used.  see if it can be deleted.
+
 export const process = function(){
-    console.log("process is starting");
+    console.log("process is starting bw");
     console.log(this);
 
     let form = document.querySelector("form");

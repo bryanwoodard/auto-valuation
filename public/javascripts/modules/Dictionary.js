@@ -20,14 +20,14 @@ export const Dictionary = {
     getCostOfEquity : function(riskFreeRate, beta, equityRiskPremium){
         return riskFreeRate + (beta * equityRiskPremium);
     },
-    getAverages: function(fields /* array of fields*/, arr /* array of objects that contain the fields*/){
-        if (!Array.isArray(fields) ) return false;
+    getAverages: function(fields /* array of fields*/, arr /* array of objects that contain the fields*/, formula/* specific dict calculation */){
+        if (!Array.isArray(fields) && formula == undefined ) return false;
         if (!Array.isArray(arr) ) return false;
 
 
         var limit = 5 > arr.length? arr.length : 5;
 
-        var averages = fields.map(calculate, arr);
+        averages = fields.map(calculate, arr);
 
         //var obj = {};
 
@@ -50,9 +50,7 @@ export const Dictionary = {
 
             function reducer(total, num){
                 return total + num;
-            }
-            
-            
+            }            
         }    
     },
     getAdjRoC: function(balanceSheet, type, metrics){
@@ -62,7 +60,7 @@ export const Dictionary = {
         const equity =  balanceSheet.totalEquity;
         const capitalLeases = balanceSheet.capitalLeaseObligations;
         const totalCapital = debt + equity + treasuryStock + capitalLeases;
-        const sharesOut = AVclass.financials.sharesOutstanding;
+        const sharesOut = AVclass.financials.statements.dcf[0].dilutedSharesOutstanding;
 
 
         let value;
@@ -74,12 +72,43 @@ export const Dictionary = {
         return value/(totalCapital/sharesOut);
 
     },
+    getAdjRoCAverages: function(balanceSheetArr, type, metricsArr){
+        var holder = [];
+
+        var count = balanceSheetArr.length < 5 ? balanceSheetArr.length : 5 ;
+
+        for(var i = 0; i<count; i++){
+            const debt = balanceSheetArr[i].longTermDebt + balanceSheetArr[i].shortTermDebt
+            //check for accuracy.
+            var treasuryStock = balanceSheetArr[i].preferredStock;
+            const equity =  balanceSheetArr[i].totalEquity;
+            const capitalLeases = balanceSheetArr[i].capitalLeaseObligations;
+            const totalCapital = debt + equity + treasuryStock + capitalLeases;
+            const sharesOut = AVclass.financials.statements.dcf[i].dilutedSharesOutstanding;
+
+
+            let value;
+            if(type == "fcf"){
+                value = metricsArr[i].freeCashFlowPerShare;
+            }else{
+                value = metricsArr[i].netIncomePerShare;
+            }
+            holder.push(value/(totalCapital/sharesOut));
+        }
+
+        var rocSum = holder.reduce((total, num)=>{
+            return total + num;
+        })
+        var rocAverage = rocSum/count;
+        return rocAverage;
+
+    },
     getAdjRoE: function(balanceSheet, type, metrics){
         //const debt = balanceSheet.longTermDebt + balanceSheet.shortTermDebt
         //check for accuracy.
         const equity = balanceSheet.preferredStock + balanceSheet.totalEquity
         //const totalCapital = debt + equity;
-        const sharesOut = AVclass.financials.sharesOutstanding;
+        const sharesOut = AVclass.financials.statements.dcf[0].dilutedSharesOutstanding;
 
         let value;
         if(type == "fcf"){

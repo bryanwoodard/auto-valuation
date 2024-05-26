@@ -1,24 +1,20 @@
 export const Utils = {
     template: function newTemplate (divId, object){
-    
-        function makeWords(varName){
-            const text = varName;
-            const result = text.replace(/([A-Z])/g, "$1");
-            const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-            return finalResult;
-        }
-        
         let location = document.getElementById(divId);
         
         if (location.childNodes){
             location.innerHTML= null;
         }
-    
+        
+        for (var key in object){
+            createElement(key);
+        }
+
         function createElement(key){
             let newElement = document.createElement("p");
             var value = object[key];
             
-            if(/*object[key] < 1 &&*/ key.includes("RO") || key.includes("return")|| key.includes("rate")){
+            if(key.includes("RO") || key.includes("return")|| key.includes("rate") || key.includes("growth") || key.includes("yield")){
                 value = value * 100
                 value = value.toFixed(2) + "%";
             } else {
@@ -28,10 +24,48 @@ export const Utils = {
             newElement.innerText = `${makeWords(key)}: ${value}`;
             location.append(newElement);
         }
-    
-        for (key in object){
-            createElement(key);
+
+        function makeWords(varName){
+            const text = varName;
+            const result = text.replace(/([A-Z])/g, "$1").replaceAll("_", " ");
+            const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+            return finalResult;
         }
+    },
+    clear: function(){
+        var arr = []
+
+        var quickStats = document.getElementById("quick-stats-head").querySelectorAll("p");
+        var valuations = document.getElementById("valuations").querySelectorAll("p");
+
+        arr.push(quickStats);
+        arr.push(valuations);
+
+        for (var i=0; i<arr.length; i++){
+            for(var j=0; j<arr[i].length; j++){
+                arr[i][j].remove();
+            }
+        }
+    },
+    toggleDisplay: function(id, show){
+
+        //var fields = ["quick-stats-head", "valuations"]
+        
+        var field = document.getElementById(id);
+        var classValue = field.className;
+        var displayClass = "d-none";
+
+    
+
+        if(show == true){
+            field.className = classValue.replaceAll(displayClass, "");
+        }
+        
+        if(show == false){
+            field.className = classValue + " " + displayClass;
+        }
+        return true;
+
     },
     validate: function (){
         let fields = document.querySelectorAll("form input");
@@ -48,6 +82,16 @@ export const Utils = {
         if(!AVclass) return false;
 
         let symbol = this.value.toUpperCase();
+
+        //If symbol changes, clear and hide everything before re-showing
+        if(AVclass.symbol !== undefined && symbol !== AVclass.symbol){
+            Utils.clear();
+            Utils.toggleDisplay("quick-stats-head", false);
+            Utils.toggleDisplay("valuations", false);
+            AVclass.valuation = null;
+        }
+
+        AVclass.symbol = symbol;
         AVclass.financials = {};
         AVclass.financials.statements = {};
         
@@ -63,20 +107,6 @@ export const Utils = {
         statements.financialGrowth = await new AVclass.Classes.Request(symbol, "financial-growth");
         statements.dcf = await new AVclass.Classes.Request(symbol, "advanced_discounted_cash_flow");
 
-        //FIXME: This should be put in the display object. Doesnt make sense to be here.
-        var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
-        var netIncome = statements.incomeStatements[0].netIncome;
-
-        var totalEquity = statements.balanceSheets[0].totalStockholdersEquity;
-        var totalDebt = statements.balanceSheets[0].longTermDebt + statements.balanceSheets[0].shortTermDebt;
-        var treasuryStock = statements.balanceSheets[0].preferredStock;
-        var capitalLeases = statements.balanceSheets[0].capitalLeaseObligations;
-        var totalCapital = totalEquity + totalDebt + treasuryStock + capitalLeases;
-
-        financials.expectedGrowthCF = operatingCashFlow / totalCapital ;
-        financials.expectedGrowthNI = netIncome/ totalCapital ;
-        financials.sharesOutstanding = statements.dcf[0].dilutedSharesOutstanding;
-
         Utils.buildDisplay();
 
     },
@@ -86,6 +116,18 @@ export const Utils = {
         const dict = AVclass.Dictionary;
 
         const statements = AVclass.financials.statements
+
+        var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
+        var netIncome = statements.incomeStatements[0].netIncome;
+
+        var totalEquity = statements.balanceSheets[0].totalStockholdersEquity;
+        var totalDebt = statements.balanceSheets[0].longTermDebt + statements.balanceSheets[0].shortTermDebt;
+        var treasuryStock = statements.balanceSheets[0].preferredStock;
+        var capitalLeases = statements.balanceSheets[0].capitalLeaseObligations;
+        var totalCapital = totalEquity + totalDebt + treasuryStock + capitalLeases;
+
+
+
         var displayObj = {
             current_price : statements.price,
             earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
@@ -97,10 +139,17 @@ export const Utils = {
             fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
             return_on_capital_listed: statements.keyMetrics[0].roic,
             return_on_equity_listed: statements.keyMetrics[0].roe,
+            expected_growth_cashflow: operatingCashFlow / totalCapital,
+            expected_growth_net_income: netIncome/ totalCapital,
+            shares_outstanding:  statements.dcf[0].dilutedSharesOutstanding,
+            average_adjusted_fcf_return_on_capital: dict.getAdjRoCAverages(statements.balanceSheets, "fcf", statements.keyMetrics)
         };
         
         AVclass.displayData = displayObj;
-        
+
+
+        this.template("quick-stats", displayObj);
+        Utils.toggleDisplay("quick-stats-head", true);
 
     }, 
     process: function(){
@@ -138,7 +187,22 @@ export const Utils = {
         obj.probabilities = [Number(processingObj.bestProb), Number(processingObj.normalProb), Number(processingObj.worstProb)]
 
         console.log(obj)
-        AVclass.valuation = new AVclass.Classes.Valuation(obj)
+        AVclass.valuation = new AVclass.Classes.Valuation(obj);
+
+        var combinedValuation = AVclass.valuation.combinedScenarios;
+
+        var singularValuation = combinedValuation.singularScenario;
+        var bestValuation = combinedValuation.probabalisticValuations[0];
+        var neutralValuation = combinedValuation.probabalisticValuations[1];
+        var worstValuation = combinedValuation.probabalisticValuations[2];
+
+        Utils.template("consolidated-data", singularValuation);
+        Utils.template("best-data", bestValuation);
+        Utils.template("neutral-data", neutralValuation);
+        Utils.template("worst-data", worstValuation);
+        
+        Utils.toggleDisplay("valuations", true);
+
     
     }
 };
