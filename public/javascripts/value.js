@@ -109,7 +109,10 @@ function fetch(symbol){
 //take the statements that are fetched and transform them into a flat simple obj
 function prepCurrent(obj){
     let statementsObj = obj;
+<<<<<<< HEAD
     
+=======
+>>>>>>> main
     let incomeObj = statementsObj.income[0];
     let cashflowObj = statementsObj.cashflow[0];
     let balanceObj = statementsObj.balancesheet[0];
