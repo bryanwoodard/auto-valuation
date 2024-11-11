@@ -21,7 +21,9 @@ export class Valuation {
         this.wacc = (this.costofEquity * this.equityPercentage) + (this.costofDebt * this.debtPercentage)
         this.fvWacc = AVclass.financials.statements.dcf[0].wacc / 100;
         this.fvTerminalGrowthRate = AVclass.financials.statements.dcf[0].longTermGrowthRate / 100;
-        this.metric = this.valuationBasis = "fcf" ? this.fcfShare : this.niPerShare
+        this.metric = this.valuationBasis == "fcf" ? this.fcfShare : this.niPerShare
+
+        console.log(`WACC == ${this.wacc}`);
         
         //Functionality
         this.consolidate = consolidate;
@@ -52,12 +54,14 @@ const process = function(){
         }
 
         //let costOfEquity = dict.getCostOfEquity(this.riskFreeRate, this.beta, this.riskFreeRate);
+
+        
         
         //FIXME; DEFINE THE METRIC VALUE TO USE AS A START I.E THE FCF OR EPS NUMBER.
         let futureMetric = dict.getFutureValue(this.metric, this.growthCaseScenarios[i], this.years);
-        let terminalMultiple = dict.getTerminalMultiple(this.beta, this.equityRiskPremium, this.riskFreeRate, this.terminalGrowthRate) * terminalModifier;
+        let terminalMultiple = dict.getTerminalMultiple(this.terminalGrowthRate , this.wacc) * terminalModifier;
         let futurePrice = dict.getFuturePrice(futureMetric, terminalMultiple);
-        let fvMultiple = 1/(this.fvWacc - this.fvTerminalGrowthRate);
+        //let fvMultiple = 1/(this.fvWacc - this.fvTerminalGrowthRate);
     
         
         valuationObj.futurePrice = futurePrice;
@@ -66,7 +70,9 @@ const process = function(){
         valuationObj.compoundedReturnCurrent = dict.getRoR(futurePrice, this.price, this.years );
 
         valuationObj.buyPrice = dict.getPresentValue(futurePrice, this.desiredReturn, this.years); // add in factor to get desired return
-        valuationObj.fairValue = dict.getPresentValue(futurePrice, 1/fvMultiple, this.years);
+        //I think the below is incorrect.
+        // valuationObj.fairValue = dict.getPresentValue(futurePrice, 1/fvMultiple, this.years);
+        valuationObj.fairValue = dict.getPresentValue(futurePrice, this.wacc, this.years);
         //valuationObj.growthRateOfMetric = growthRate * growthCaseScenarios[i];
         
 

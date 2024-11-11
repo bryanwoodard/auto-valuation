@@ -14,8 +14,9 @@ export const Dictionary = {
     getFuturePrice: function(futureMetric, multiple){
         return (futureMetric * multiple);
     },
-    getTerminalMultiple: function(beta, erp, riskFreeRate, terminalGrowthRate){ /* FIXME: //returns capm ... also think about including cost of debt and wacc as well*/
-        return 1/( (riskFreeRate + (beta*erp)) - terminalGrowthRate );
+    getTerminalMultiple: function(terminalGrowthRate, wacc){ 
+        // return 1/( (riskFreeRate + (beta*erp)) - terminalGrowthRate );
+        return ( (1+terminalGrowthRate) / (wacc - terminalGrowthRate) )
     },
     getCostOfEquity : function(riskFreeRate, beta, equityRiskPremium){
         return riskFreeRate + (beta * equityRiskPremium);
