@@ -130,18 +130,21 @@ export const Utils = {
 
         var displayObj = {
             current_price : statements.price,
+            
             earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
             free_cash_flow_per_share: statements.keyMetrics[0].freeCashFlowPerShare,
-            earnings_growth_five_years: dict.getRoR(statements.keyMetrics[0].netIncomePerShare, statements.keyMetrics[5].netIncomePerShare, 5),
-            fcf_growth_five_years: dict.getRoR(statements.keyMetrics[0].freeCashFlowPerShare, statements.keyMetrics[5].freeCashFlowPerShare, 5),
             current_dividend_yield: statements.keyMetrics[0].dividendYield,
-            fcf_return_on_capital_adjusted: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
-            fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            shares_outstanding:  statements.dcf[0].dilutedSharesOutstanding,
+            //earnings metrics
+            earnings_growth_five_years: dict.getRoR(statements.keyMetrics[0].netIncomePerShare, statements.keyMetrics[5].netIncomePerShare, 5),
+            expected_growth_net_income: netIncome/ totalCapital,
             return_on_capital_listed: statements.keyMetrics[0].roic,
             return_on_equity_listed: statements.keyMetrics[0].roe,
+            //fcf metrics
+            fcf_growth_five_years: dict.getRoR(statements.keyMetrics[0].freeCashFlowPerShare, statements.keyMetrics[5].freeCashFlowPerShare, 5),
             expected_growth_cashflow: operatingCashFlow / totalCapital,
-            expected_growth_net_income: netIncome/ totalCapital,
-            shares_outstanding:  statements.dcf[0].dilutedSharesOutstanding,
+            fcf_return_on_capital_adjusted: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
             average_adjusted_fcf_return_on_capital: dict.getAdjRoCAverages(statements.balanceSheets, "fcf", statements.keyMetrics)
         };
         

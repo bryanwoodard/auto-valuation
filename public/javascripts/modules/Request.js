@@ -7,7 +7,7 @@ export class Request extends Base{
         this.item = item;
         this.apiKey = "Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
         this.urlStem = `https://financialmodelingprep.com/api/v3/`;
-        this.priceURL = this.urlStem + `stock/real-time-price/${symbol}?apikey=${this.apiKey}`;
+        this.priceURL = this.urlStem + `quote/${symbol}?apikey=${this.apiKey}`;
         this.statementUrl = this.urlStem +`${item}/${symbol}?period=annual&apikey=${this.apiKey}`;
         this.dcfUrl = `https://financialmodelingprep.com/api/v4/advanced_discounted_cash_flow?symbol=${symbol}&apikey=${this.apiKey}`
         this.getData =  getData;
@@ -55,7 +55,8 @@ async function getData (symbol, item, place){
         console.log(data);
                        
         if(item == "price"){
-            data = data.companiesPriceList[0].price;
+            // data = data.companiesPriceList[0].price;
+            data = data[0].price;
         }
 
         return data;
