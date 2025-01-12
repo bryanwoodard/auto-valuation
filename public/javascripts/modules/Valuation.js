@@ -21,8 +21,8 @@ export class Valuation {
         this.wacc = (this.costofEquity * this.equityPercentage) + (this.costofDebt * this.debtPercentage)
         this.fvWacc = AVclass.financials.statements.dcf[0].wacc / 100;
         this.fvTerminalGrowthRate = AVclass.financials.statements.dcf[0].longTermGrowthRate / 100;
-        this.adjusted_op_cash_flow_per_share = AVclass.displayData.adjusted_op_cash_flow_per_share;
-        this.metric = this.valuationBasis == "fcf" ? this.adjusted_op_cash_flow_per_share : this.niPerShare
+        this.adjFCFPerShare = AVclass.displayData.adjusted_op_fcf_per_share;
+        this.metric = this.valuationBasis == "fcf" ? this.fcfShare : this.valuationBasis == "adj_fcf" ? this.adjFCFPerShare: this.niPerShare
 
 
         console.log(`WACC == ${this.wacc}`);

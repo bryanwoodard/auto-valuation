@@ -48,24 +48,18 @@ export const Utils = {
         }
     },
     toggleDisplay: function(id, show){
-
         //var fields = ["quick-stats-head", "valuations"]
-        
         var field = document.getElementById(id);
         var classValue = field.className;
         var displayClass = "d-none";
 
-    
-
         if(show == true){
             field.className = classValue.replaceAll(displayClass, "");
         }
-        
         if(show == false){
             field.className = classValue + " " + displayClass;
         }
         return true;
-
     },
     validate: function (){
         let fields = document.querySelectorAll("form input");
@@ -106,6 +100,7 @@ export const Utils = {
         statements.ratios = await new AVclass.Classes.Request(symbol, "ratios");
         statements.financialGrowth = await new AVclass.Classes.Request(symbol, "financial-growth");
         statements.dcf = await new AVclass.Classes.Request(symbol, "advanced_discounted_cash_flow");
+        statements.allData = await new AVclass.Classes.Request(symbol, "financial-statement-full-as-reported");
 
         Utils.buildDisplay();
 
@@ -119,26 +114,41 @@ export const Utils = {
 
         var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
         var netIncome = statements.incomeStatements[0].netIncome;
-
         var totalEquity = statements.balanceSheets[0].totalStockholdersEquity;
         var totalDebt = statements.balanceSheets[0].longTermDebt + statements.balanceSheets[0].shortTermDebt;
-        var treasuryStock = statements.balanceSheets[0].preferredStock;
+        var preferredStock = statements.balanceSheets[0].preferredStock;
+        // var treasuryStock = statements.allData[0].treasurystockcommonvalue ? statements.allData[0].treasurystockcommonvalue : statements.allData[0].treasurystockvalue;
         var capitalLeases = statements.balanceSheets[0].capitalLeaseObligations;
-        var totalCapital = totalEquity + totalDebt + treasuryStock + capitalLeases;
+        var totalCapital = totalEquity + totalDebt + /*treasuryStock + */ capitalLeases + preferredStock;
         var stockBasedCompensation = statements.cashflowStatements[0].stockBasedCompensation;
         var operatingCashFlowLessSBC = operatingCashFlow - stockBasedCompensation;
-        var sharesOutstanding =  statements.dcf[0].dilutedSharesOutstanding;
+        var sharesOutstanding =  statements.incomeStatements[0].weightedAverageShsOutDil;
+        var capEx = statements.cashflowStatements[0].capitalExpenditure;
         var operatingCashFlowLessSBCPerShare = operatingCashFlowLessSBC / sharesOutstanding;
+        var freeCashFlowLessSBC = operatingCashFlowLessSBC + capEx;
+        var freeCashFlowLessSBCPerShare = freeCashFlowLessSBC/sharesOutstanding;
+        var faustmanRatio = (statements.price * sharesOutstanding)/ totalEquity;
 
-
+        //TODO: Build these out.
+        /**
+         * lynch ratio
+         * better "expected fcf growth"calc that take cfroic * reinv rate (reinv rate = capex + nwc)
+         * i.e (op cashflow / invested capital_raw) x ( (capex + change in NWC)/ opcashflow)
+         * simplified => (capex + change in NWC) / invested capital
+         * see valuation workbook scratch page cells A201:B212
+         */
+        var lynchRatio ;
 
         var displayObj = {
             current_price : statements.price,
+            beta: statements.dcf[0].beta,
             earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
+            adjusted_op_cashflow_per_share: operatingCashFlowLessSBCPerShare,
             free_cash_flow_per_share: statements.keyMetrics[0].freeCashFlowPerShare,
-            adjusted_op_cash_flow_per_share: operatingCashFlowLessSBCPerShare,
+            adjusted_op_fcf_per_share: freeCashFlowLessSBCPerShare,
             current_dividend_yield: statements.keyMetrics[0].dividendYield,
             shares_outstanding:  sharesOutstanding,
+            faustman_ratio: faustmanRatio,
             //earnings metrics
             earnings_growth_five_years: dict.getRoR(statements.keyMetrics[0].netIncomePerShare, statements.keyMetrics[5].netIncomePerShare, 5),
             expected_growth_net_income: netIncome/ totalCapital,
@@ -146,10 +156,16 @@ export const Utils = {
             return_on_equity_listed: statements.keyMetrics[0].roe,
             //fcf metrics
             fcf_growth_five_years: dict.getRoR(statements.keyMetrics[0].freeCashFlowPerShare, statements.keyMetrics[5].freeCashFlowPerShare, 5),
-            expected_growth_cashflow: operatingCashFlowLessSBC / totalCapital,
+            expected_growth_cashflow_raw: operatingCashFlow / totalCapital,
+            // THIS ONE!
+            expected_growth_cashflow_SBC_adjusted_CFROIC: operatingCashFlowLessSBC / totalCapital,
+            average_adj_SBC_CFROIC: dict.getAdjAverages(statements.balanceSheets, "cfroic", null, statements.cashflowStatements),
+            //TODO: Fix the two below to use SBC factored 
             fcf_return_on_capital_adjusted: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
             fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
-            average_adjusted_fcf_return_on_capital: dict.getAdjRoCAverages(statements.balanceSheets, "fcf", statements.keyMetrics)
+            sbc_factored_fcf_return_on_capital : freeCashFlowLessSBC/ totalCapital,
+            average_adjusted_fcf_return_on_capital: dict.getAdjAverages(statements.balanceSheets, "fcf", statements.keyMetrics),
+            
         };
         
         AVclass.displayData = displayObj;

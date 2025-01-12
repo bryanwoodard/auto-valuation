@@ -73,24 +73,31 @@ export const Dictionary = {
         return value/(totalCapital/sharesOut);
 
     },
-    getAdjRoCAverages: function(balanceSheetArr, type, metricsArr){
+    getAdjAverages: function(balanceSheetArr, type, metricsArr, cashflowArr){
         var holder = [];
 
         var count = balanceSheetArr.length < 5 ? balanceSheetArr.length : 5 ;
 
         for(var i = 0; i<count; i++){
             const debt = balanceSheetArr[i].longTermDebt + balanceSheetArr[i].shortTermDebt
-            //check for accuracy.
-            var treasuryStock = balanceSheetArr[i].preferredStock;
+            //TODO: check for accuracy.
+            var preferredStock = balanceSheetArr[i].preferredStock;
+            //var treasuryStock = AVclass.financials.statements.allData[i].treasurystockcommonvalue ? AVclass.financials.statements.allData[i].treasurystockcommonvalue : AVclass.financials.statements.allData[i].treasurystockvalue;
             const equity =  balanceSheetArr[i].totalEquity;
             const capitalLeases = balanceSheetArr[i].capitalLeaseObligations;
-            const totalCapital = debt + equity + treasuryStock + capitalLeases;
-            const sharesOut = AVclass.financials.statements.dcf[i].dilutedSharesOutstanding;
-
+            const totalCapital = debt + equity /*+ treasuryStock */+ capitalLeases + preferredStock;
+            const sharesOut = AVclass.financials.statements.incomeStatements[i].weightedAverageShsOutDil;
 
             let value;
             if(type == "fcf"){
                 value = metricsArr[i].freeCashFlowPerShare;
+            }else if (type == "cfroic"){
+                // this part
+                var operatingCashFlow = cashflowArr[i].operatingCashFlow;
+                var stockBasedCompensation = cashflowArr[i].stockBasedCompensation;
+                var operatingCashFlowLessSBC = operatingCashFlow - stockBasedCompensation;
+                var operatingCashFlowLessSBCPerShare = operatingCashFlowLessSBC / sharesOut;
+                value = operatingCashFlowLessSBCPerShare;
             }else{
                 value = metricsArr[i].netIncomePerShare;
             }

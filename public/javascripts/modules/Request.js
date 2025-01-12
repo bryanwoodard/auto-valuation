@@ -24,6 +24,7 @@ async function getData (symbol, item, place){
     "key-metrics",
     "ratios",
     "price",
+    "financial-statement-full-as-reported",
     "financial-growth",
     "advanced_discounted_cash_flow"
     ];
