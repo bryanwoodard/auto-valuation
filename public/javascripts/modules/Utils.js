@@ -87,21 +87,10 @@ export const Utils = {
 
         AVclass.symbol = symbol;
         AVclass.financials = {};
-        AVclass.financials.statements = {};
+        AVclass.financials.statements = await new AVclass.Classes.Request(symbol);
         
-        var financials = AVclass.financials;
-        var statements = AVclass.financials.statements;
-
-        statements.price = await new AVclass.Classes.Request(symbol, "price");
-        statements.incomeStatements = await new AVclass.Classes.Request(symbol, "income-statement");
-        statements.balanceSheets = await new AVclass.Classes.Request(symbol, "balance-sheet-statement");
-        statements.cashflowStatements = await new AVclass.Classes.Request(symbol, "cash-flow-statement");
-        statements.keyMetrics = await new AVclass.Classes.Request(symbol, "key-metrics");
-        statements.ratios = await new AVclass.Classes.Request(symbol, "ratios");
-        statements.financialGrowth = await new AVclass.Classes.Request(symbol, "financial-growth");
-        statements.dcf = await new AVclass.Classes.Request(symbol, "advanced_discounted_cash_flow");
-        statements.allData = await new AVclass.Classes.Request(symbol, "financial-statement-full-as-reported");
-
+        console.log("FETCHING ALL THE STATEMENTS...")
+        
         Utils.buildDisplay();
 
     },
@@ -109,7 +98,6 @@ export const Utils = {
         console.log("this is the function we will use to display stuff");
 
         const dict = AVclass.Dictionary;
-
         const statements = AVclass.financials.statements
 
         var operatingCashFlow = statements.cashflowStatements[0].operatingCashFlow;
@@ -169,7 +157,6 @@ export const Utils = {
         };
         
         AVclass.displayData = displayObj;
-
 
         this.template("quick-stats", displayObj);
         Utils.toggleDisplay("quick-stats-head", true);

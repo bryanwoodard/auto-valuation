@@ -1,10 +1,7 @@
-// copied from the public methods
+// SERVER SIDE FMP REQUEST
 require('dotenv').config();
 const apiKey = process.env.FMP;
 const apiHost = process.env.STEM;
-// console.log("api key = "+ apiKey)
-// console.log(process.env)
-
 
 module.exports = class Request {
     constructor(symbol, item ){
@@ -64,7 +61,6 @@ async function getData (symbol, item, place){
             // data = data.companiesPriceList[0].price;
             data = data[0].price;
         }
-
         return data;
         
     }catch(e){

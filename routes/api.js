@@ -6,9 +6,11 @@ const Request = require('./request/requestMethods')
 
 /* GET home page. */
 router.get('/fetch', async function(req, res, next) {
+    res.setHeader('Content-Type', 'application/json');
+    
     const symbol = req.query.symbol;
+    
     var statements = {};
-
     statements.price = await new Request(symbol, "price");
     statements.incomeStatements = await new Request(symbol, "income-statement");
     statements.balanceSheets = await new Request(symbol, "balance-sheet-statement");
@@ -18,14 +20,12 @@ router.get('/fetch', async function(req, res, next) {
     statements.financialGrowth = await new Request(symbol, "financial-growth");
     statements.dcf = await new Request(symbol, "advanced_discounted_cash_flow");
     statements.allData = await new Request(symbol, "financial-statement-full-as-reported");
-    res.send('You hit the api page hoe!' + JSON.stringify(statements));
+    res.json(statements);
 });
 
 
 router.get('/b', function(req, res, next) {
-    res.send('You hit the "b" page hoe!');
+    res.send('You hit the "b" page --- test!');
 });
-
-
 
 module.exports = router;

@@ -5,11 +5,7 @@ export class Request extends Base{
         super();
         this.symbol = symbol;
         this.item = item;
-        this.apiKey = "Jv4pLAquV4LEKSBYbYaYZXUm6cnVb1rc";
-        this.urlStem = `https://financialmodelingprep.com/api/v3/`;
-        this.priceURL = this.urlStem + `quote/${symbol}?apikey=${this.apiKey}`;
-        this.statementUrl = this.urlStem +`${item}/${symbol}?period=annual&apikey=${this.apiKey}`;
-        this.dcfUrl = `https://financialmodelingprep.com/api/v4/advanced_discounted_cash_flow?symbol=${symbol}&apikey=${this.apiKey}`
+        this.urlStem = `/api/fetch?symbol=${symbol}`;
         this.getData =  getData;
 
         return getData.call(this, symbol, item);
@@ -18,40 +14,10 @@ export class Request extends Base{
 
 
 async function getData (symbol, item, place){
-    const statements = ["income-statement", 
-    "balance-sheet-statement", 
-    "cash-flow-statement", 
-    "key-metrics",
-    "ratios",
-    "price",
-    "financial-statement-full-as-reported",
-    "financial-growth",
-    "advanced_discounted_cash_flow"
-    ];
-
-    if(!item){
-        console.warn("Request called but with nothing to fetch");
-        return false;
-    }
-
-    if(!statements.includes(item)){
-        console.warn("Request called but with bad item to fetch");
-        return false;
-    }
-
-    let choiceURl = "";
-    if(item == "price"){
-        choiceURl = this.priceURL;
-    } else if (item == "advanced_discounted_cash_flow" ){
-        choiceURl = this.dcfUrl;
-    } else {
-        choiceURl = this.statementUrl;
-    }
-
     try{
-        console.log("trying the request for " + item);
+        console.log("trying the requests for statements");
         
-        let response = await fetch(choiceURl);
+        let response = await fetch(this.urlStem);
         let data =  await response.json();
         console.log(data);
                        
