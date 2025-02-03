@@ -1,28 +1,50 @@
 export const Utils = {
-    template: function newTemplate (divId, object){
+    template: function (divId, object){
         let location = document.getElementById(divId);
         
         if (location.childNodes){
             location.innerHTML= null;
         }
-        
-        for (var key in object){
-            createElement(key);
-        }
+        createList(location, object)
+        // for (var key in object){
+        //     createElement(key);
+        // }
 
-        function createElement(key){
-            let newElement = document.createElement("p");
-            var value = object[key];
+        // function createElement(key){
+        //     let newElement = document.createElement("ul");
+        //     var value = object[key];
             
-            if(key.includes("RO") || key.includes("return")|| key.includes("rate") || key.includes("growth") || key.includes("yield")){
-                value = value * 100
-                value = value.toFixed(2) + "%";
-            } else {
-                value = value.toFixed(2);
-            }
+        //     if(key.includes("RO") || key.includes("return")|| key.includes("rate") || key.includes("growth") || key.includes("yield")){
+        //         value = value * 100
+        //         value = value.toFixed(2) + "%";
+        //     } else if(typeof value !== "string"){
+        //         value = value.toFixed(2);
+        //     }
     
-            newElement.innerText = `${makeWords(key)}: ${value}`;
-            location.append(newElement);
+        //     newElement.innerText = `${makeWords(key)}: ${value}`;
+        //     location.append(newElement);
+        // }
+
+        function createList(location, object){
+            let listElement = document.createElement("ul");
+            
+            for(var key in object){
+                var value = object[key];
+
+                if(key.includes("RO") || key.includes("return")|| key.includes("rate") || key.includes("growth") || key.includes("yield")){
+                    value = value * 100
+                    value = value.toFixed(2) + "%";
+                } else if(typeof value !== "string"){
+                    value = value.toFixed(2);
+                }
+                let entry = document.createElement("li");
+                entry.innerText = `${makeWords(key)}: ${value}`;
+                listElement.appendChild(entry)
+
+            }
+            location.appendChild(listElement);
+
+
         }
 
         function makeWords(varName){
@@ -87,8 +109,8 @@ export const Utils = {
 
         AVclass.symbol = symbol;
         AVclass.financials = {};
+
         AVclass.financials.statements = await new AVclass.Classes.Request(symbol);
-        
         console.log("FETCHING ALL THE STATEMENTS...")
         
         Utils.buildDisplay();
@@ -126,39 +148,48 @@ export const Utils = {
          * see valuation workbook scratch page cells A201:B212
          */
         var lynchRatio ;
-
-        var displayObj = {
+        
+        var generalData = {
+            company_name: statements.profile[0].companyName,
+            description: statements.profile[0].description,
+            industry: statements.profile[0].industry,
             current_price : statements.price,
             beta: statements.dcf[0].beta,
             earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
-            adjusted_op_cashflow_per_share: operatingCashFlowLessSBCPerShare,
             free_cash_flow_per_share: statements.keyMetrics[0].freeCashFlowPerShare,
-            adjusted_op_fcf_per_share: freeCashFlowLessSBCPerShare,
+            adjusted_op_cashflow_per_share: operatingCashFlowLessSBCPerShare,
             current_dividend_yield: statements.keyMetrics[0].dividendYield,
             shares_outstanding:  sharesOutstanding,
             faustman_ratio: faustmanRatio,
-            //earnings metrics
+        }
+        var earningsData = {
             earnings_growth_five_years: dict.getRoR(statements.keyMetrics[0].netIncomePerShare, statements.keyMetrics[5].netIncomePerShare, 5),
             expected_growth_net_income: netIncome/ totalCapital,
             return_on_capital_listed: statements.keyMetrics[0].roic,
             return_on_equity_listed: statements.keyMetrics[0].roe,
-            //fcf metrics
+        }
+        var cashflowData = {
             fcf_growth_five_years: dict.getRoR(statements.keyMetrics[0].freeCashFlowPerShare, statements.keyMetrics[5].freeCashFlowPerShare, 5),
-            expected_growth_cashflow_raw: operatingCashFlow / totalCapital,
+            cashflow_ROIC_raw: operatingCashFlow / totalCapital,
             // THIS ONE!
-            expected_growth_cashflow_SBC_adjusted_CFROIC: operatingCashFlowLessSBC / totalCapital,
-            average_adj_SBC_CFROIC: dict.getAdjAverages(statements.balanceSheets, "cfroic", null, statements.cashflowStatements),
+            share_based_compensation_adjusted_CFROIC: operatingCashFlowLessSBC / totalCapital,
+            average_SBC_CFROIC: dict.getAdjAverages(statements.balanceSheets, "cfroic", null, statements.cashflowStatements),
             //TODO: Fix the two below to use SBC factored 
-            fcf_return_on_capital_adjusted: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
-            fcf_return_on_equity_adjusted : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
-            sbc_factored_fcf_return_on_capital : freeCashFlowLessSBC/ totalCapital,
-            average_adjusted_fcf_return_on_capital: dict.getAdjAverages(statements.balanceSheets, "fcf", statements.keyMetrics),
-            
-        };
+            fcf_return_on_capital: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            fcf_return_on_equity : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            // sbc_factored_fcf_return_on_capital : freeCashFlowLessSBC/ totalCapital,
+            // average_adjusted_fcf_return_on_capital: dict.getAdjAverages(statements.balanceSheets, "fcf", statements.keyMetrics),
+        }
+
+        var displayObj = {...generalData, ...earningsData, ...cashflowData}
         
         AVclass.displayData = displayObj;
 
-        this.template("quick-stats", displayObj);
+        // this.template("quick-stats", displayObj);
+        this.template("general-data", generalData);
+        this.template("earnings-data", earningsData);
+        this.template("cashflow-data", cashflowData);
+
         Utils.toggleDisplay("quick-stats-head", true);
 
     }, 

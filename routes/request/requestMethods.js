@@ -9,6 +9,7 @@ module.exports = class Request {
         this.item = item;
         this.apiKey = apiKey;
         this.urlStem = `${apiHost}/v3/`;
+        this.profileUrl = this.urlStem + `profile/${symbol}?apikey=${this.apiKey}`;
         this.priceURL = this.urlStem + `quote/${symbol}?apikey=${this.apiKey}`;
         this.statementUrl = this.urlStem +`${item}/${symbol}?period=annual&apikey=${this.apiKey}`;
         this.dcfUrl = `${apiHost}/v4/advanced_discounted_cash_flow?symbol=${symbol}&apikey=${this.apiKey}`
@@ -28,7 +29,8 @@ async function getData (symbol, item, place){
     "price",
     "financial-statement-full-as-reported",
     "financial-growth",
-    "advanced_discounted_cash_flow"
+    "advanced_discounted_cash_flow",
+    "profile"
     ];
 
     if(!item){
@@ -46,6 +48,8 @@ async function getData (symbol, item, place){
         choiceURl = this.priceURL;
     } else if (item == "advanced_discounted_cash_flow" ){
         choiceURl = this.dcfUrl;
+    }else if (item == "profile") {
+        choiceURl = this.profileUrl
     } else {
         choiceURl = this.statementUrl;
     }

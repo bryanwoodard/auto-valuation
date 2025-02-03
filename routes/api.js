@@ -20,12 +20,13 @@ router.get('/fetch', async function(req, res, next) {
     statements.financialGrowth = await new Request(symbol, "financial-growth");
     statements.dcf = await new Request(symbol, "advanced_discounted_cash_flow");
     statements.allData = await new Request(symbol, "financial-statement-full-as-reported");
+    statements.profile = await new Request( symbol, "profile");
     res.json(statements);
 });
 
 
-router.get('/b', function(req, res, next) {
-    res.send('You hit the "b" page --- test!');
-});
+// router.get('/b', function(req, res, next) {
+//     res.send('You hit the "b" page --- test!');
+// });
 
 module.exports = router;
