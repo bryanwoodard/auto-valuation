@@ -110,10 +110,15 @@ export const Utils = {
         AVclass.symbol = symbol;
         AVclass.financials = {};
 
-        AVclass.financials.statements = await new AVclass.Classes.Request(symbol);
-        console.log("FETCHING ALL THE STATEMENTS...")
+        try {
+            AVclass.financials.statements = await new AVclass.Classes.Request(symbol);
+            console.log("FETCHING ALL THE STATEMENTS...")
+            
+            Utils.buildDisplay();
+        } catch (error) {
+            console.log(error)
+        }
         
-        Utils.buildDisplay();
 
     },
     buildDisplay: function(){
