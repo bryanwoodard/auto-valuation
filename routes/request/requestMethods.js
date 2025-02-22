@@ -68,7 +68,7 @@ async function getData (symbol, item, place){
         return data;
         
     }catch(e){
-        alert(`${symbol} does not look to be a valid symbol.  Please try again`)
+        // alert(`${symbol} does not look to be a valid symbol.  Please try again`)
         console.error(`Something went wrong with the request. See: ${e}`);
     }
     

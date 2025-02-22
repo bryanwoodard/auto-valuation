@@ -1,8 +1,36 @@
-body {
+@import "tailwindcss";
+ /* body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
+} */
+/*
 a {
   color: #00B7FF;
+} */
+
+@theme{
+  --font-display: "Satoshi", "sans-serif";
+}
+
+@layer components {
+  .submit {
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-violet-500);
+    padding-inline: --spacing(5);
+    padding-block: --spacing(2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-violet-700);
+      }
+    }
+  }
+  form input {
+    background-color: var(--color-gray-100);
+    padding-inline: --spacing(5);
+    padding-block: --spacing(.5);
+  }
+
 }
