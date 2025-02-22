@@ -11,22 +11,29 @@ router.get('/fetch', async function(req, res, next) {
     const symbol = req.query.symbol;
     
     var statements = {};
-    statements.price = await new Request(symbol, "price");
+   
+    try {
+        statements.price = await new Request(symbol, "price");
 
-    if(statements.price == null || typeof statements.price == undefined){
-        throw new Error("Cant get Price Data")
+        if(statements.price == null || typeof statements.price == undefined){
+            throw new Error("Cant get Price Data")
+        }
+
+        statements.incomeStatements = await new Request(symbol, "income-statement");
+        statements.balanceSheets = await new Request(symbol, "balance-sheet-statement");
+        statements.cashflowStatements = await new Request(symbol, "cash-flow-statement");
+        statements.keyMetrics = await new Request(symbol, "key-metrics");
+        statements.ratios = await new Request(symbol, "ratios");
+        statements.financialGrowth = await new Request(symbol, "financial-growth");
+        statements.dcf = await new Request(symbol, "advanced_discounted_cash_flow");
+        statements.allData = await new Request(symbol, "financial-statement-full-as-reported");
+        statements.profile = await new Request( symbol, "profile");
+        res.json(statements);
+    } catch (error) {
+        console.error("We tried to get the data, but something went wrong.  See: ", error);
+        res.json({error: "We tried to get the data, but something went wrong.  See: ", error});
     }
-
-    statements.incomeStatements = await new Request(symbol, "income-statement");
-    statements.balanceSheets = await new Request(symbol, "balance-sheet-statement");
-    statements.cashflowStatements = await new Request(symbol, "cash-flow-statement");
-    statements.keyMetrics = await new Request(symbol, "key-metrics");
-    statements.ratios = await new Request(symbol, "ratios");
-    statements.financialGrowth = await new Request(symbol, "financial-growth");
-    statements.dcf = await new Request(symbol, "advanced_discounted_cash_flow");
-    statements.allData = await new Request(symbol, "financial-statement-full-as-reported");
-    statements.profile = await new Request( symbol, "profile");
-    res.json(statements);
+    
 });
 
 

@@ -22,7 +22,7 @@ export class Valuation {
         this.fvWacc = AVclass.financials.statements.dcf[0].wacc / 100;
         this.fvTerminalGrowthRate = AVclass.financials.statements.dcf[0].longTermGrowthRate / 100;
         this.adjFCFPerShare = AVclass.displayData.adjusted_op_fcf_per_share;
-        this.metric = this.valuationBasis == "fcf" ? this.fcfShare : this.valuationBasis == "adj_fcf" ? this.adjFCFPerShare: this.niPerShare
+        this.metric = this.valuationBasis == "fcf" ? this.fcfShare : this.niPerShare
 
 
         console.log(`WACC == ${this.wacc}`);

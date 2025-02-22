@@ -1,6 +1,10 @@
 export const init = function(){
-    console.log("initiliazed");
-    document.getElementById("ticker").addEventListener("change", AVclass.Utils.getStatments);
+    console.log("initiliazing...");
+    
+    
+    document.getElementById("ticker").addEventListener("change", AVclass.Utils.getStatements);
+   
+    
     document.getElementById("submit").addEventListener("click", AVclass.Utils.process)
     //console.log("attached submit handler");
 

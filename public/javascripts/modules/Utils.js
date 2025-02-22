@@ -74,30 +74,40 @@ export const Utils = {
             }
         }
     },
-    getStatments: async function(){
-        if(!AVclass) return false;
+    getStatements: async function(){
+        console.log("fetching statements...");
 
-        let symbol = this.value.toUpperCase();
+        try {
+            if(!AVclass) return false;
 
-        //If symbol changes, clear and hide everything before re-showing
-        if(AVclass.symbol !== undefined && symbol !== AVclass.symbol){
+            let symbol = this.value.toUpperCase();
+
+            //If symbol changes, clear and hide everything before re-showing
+            if(AVclass.symbol !== undefined && symbol !== AVclass.symbol){
             Utils.clear();
             Utils.toggleDisplay("quick-stats-head", false);
             Utils.toggleDisplay("valuations", false);
             AVclass.valuation = null;
-        }
+            }
 
-        AVclass.symbol = symbol;
-        AVclass.financials = {};
+            AVclass.symbol = symbol;
+            AVclass.financials = {};
 
-        try {
+            console.log("trying the requests for statements");
             AVclass.financials.statements = await new AVclass.Classes.Request(symbol);
-            console.log("FETCHING ALL THE STATEMENTS...")
-            
-            Utils.buildDisplay();
+
+            if (AVclass.financials.statements.error){
+                throw new Error("No data was returned -- check the symbol and try again");
+            } else {
+                Utils.buildDisplay();
+            }
         } catch (error) {
-            console.log(error)
+            alert("There was an error fetching the statements.  Please check the symbol and try again.");
+            console.error("An error occurred while fetching financial statements:", error);
+            return false
         }
+        console.log("statements have been fetched");
+        return true;    
         
 
     },
