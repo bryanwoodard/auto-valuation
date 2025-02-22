@@ -6,24 +6,6 @@ export const Utils = {
             location.innerHTML= null;
         }
         createList(location, object)
-        // for (var key in object){
-        //     createElement(key);
-        // }
-
-        // function createElement(key){
-        //     let newElement = document.createElement("ul");
-        //     var value = object[key];
-            
-        //     if(key.includes("RO") || key.includes("return")|| key.includes("rate") || key.includes("growth") || key.includes("yield")){
-        //         value = value * 100
-        //         value = value.toFixed(2) + "%";
-        //     } else if(typeof value !== "string"){
-        //         value = value.toFixed(2);
-        //     }
-    
-        //     newElement.innerText = `${makeWords(key)}: ${value}`;
-        //     location.append(newElement);
-        // }
 
         function createList(location, object){
             let listElement = document.createElement("ul");
@@ -43,8 +25,6 @@ export const Utils = {
 
             }
             location.appendChild(listElement);
-
-
         }
 
         function makeWords(varName){
@@ -143,6 +123,7 @@ export const Utils = {
         var freeCashFlowLessSBC = operatingCashFlowLessSBC + capEx;
         var freeCashFlowLessSBCPerShare = freeCashFlowLessSBC/sharesOutstanding;
         var faustmanRatio = (statements.price * sharesOutstanding)/ totalEquity;
+        var freeCashFlowPerShare = (operatingCashFlow - capEx)/sharesOutstanding;
 
         //TODO: Build these out.
         /**
@@ -162,6 +143,7 @@ export const Utils = {
             beta: statements.dcf[0].beta,
             earnings_per_share: statements.keyMetrics[0].netIncomePerShare,
             free_cash_flow_per_share: statements.keyMetrics[0].freeCashFlowPerShare,
+            // free_cash_flow_per_share : freeCashFlowPerShare,
             adjusted_op_cashflow_per_share: operatingCashFlowLessSBCPerShare,
             current_dividend_yield: statements.keyMetrics[0].dividendYield,
             shares_outstanding:  sharesOutstanding,

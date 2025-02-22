@@ -14,7 +14,7 @@ router.get('/fetch', async function(req, res, next) {
     statements.price = await new Request(symbol, "price");
 
     if(statements.price == null || typeof statements.price == undefined){
-        throw new Error("There is likely an issue with the symbol")
+        throw new Error("Cant get Price Data")
     }
 
     statements.incomeStatements = await new Request(symbol, "income-statement");

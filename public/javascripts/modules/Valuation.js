@@ -14,8 +14,8 @@ export class Valuation {
         this.price = AVclass.displayData.current_price;
         this.fcfShare = AVclass.financials.statements.keyMetrics[0].freeCashFlowPerShare;
         this.niPerShare = AVclass.financials.statements.keyMetrics[0].netIncomePerShare;
-        this.equityPercentage = AVclass.financials.statements.dcf[0].equityWeighting / 100;
         this.debtPercentage = AVclass.financials.statements.dcf[0].debtWeighting / 100;
+        this.equityPercentage = (1 - this.debtPercentage) || (AVclass.financials.statements.dcf[0].equityWeighting / 100) 
         this.costofDebt = AVclass.financials.statements.dcf[0].afterTaxCostOfDebt/100;
         this.costofEquity = AVclass.Dictionary.getCostOfEquity(this.riskFreeRate, this.beta, this.equityRiskPremium);
         this.wacc = (this.costofEquity * this.equityPercentage) + (this.costofDebt * this.debtPercentage)
