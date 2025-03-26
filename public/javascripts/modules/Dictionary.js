@@ -126,7 +126,16 @@ export const Dictionary = {
         }
         return value/(equity/sharesOut);
 
-    }
+    },
+    getExpectedGrowthRateCF: function(balanceSheetArr, incomeStatementArr, cashflowArr){
+        //continue  
+        for (var i =0; i<5; i++){
+            var netCapEx = statements.balanceSheets[0].propertyPlantEquipmentNet - statements.balanceSheets[1].propertyPlantEquipmentNet + statements.incomeStatements[0].depreciationAndAmortization;
+            var changeInNWC = statements.cashflowStatements[0].changeInWorkingCapital;
+            var reinvestmentRate = (netCapEx + changeInNWC) / operatingCashFlow;
+            var expectedGrowth = reinvestmentRate * (operatingCashFlow / totalCapital);
+        }
+    },
 
 
 

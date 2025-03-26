@@ -134,6 +134,14 @@ export const Utils = {
         var freeCashFlowLessSBCPerShare = freeCashFlowLessSBC/sharesOutstanding;
         var faustmanRatio = (statements.price * sharesOutstanding)/ totalEquity;
         var freeCashFlowPerShare = (operatingCashFlow - capEx)/sharesOutstanding;
+        // reinvestmentRate = (net capex + change in NWC)/operating cash flow
+        //expected growth = reinvestmentRate * cfroic || reinvestmentRate / investedCapital;
+        
+        var netCapEx = statements.balanceSheets[0].propertyPlantEquipmentNet - statements.balanceSheets[1].propertyPlantEquipmentNet + statements.incomeStatements[0].depreciationAndAmortization;
+        var changeInNWC = statements.cashflowStatements[0].changeInWorkingCapital;
+        var reinvestmentRate = (netCapEx + changeInNWC) / operatingCashFlow;
+        var expectedGrowth = reinvestmentRate * (operatingCashFlow / totalCapital);
+        
 
         //TODO: Build these out.
         /**
@@ -174,6 +182,8 @@ export const Utils = {
             //TODO: Fix the two below to use SBC factored 
             fcf_return_on_capital: dict.getAdjRoC(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
             fcf_return_on_equity : dict.getAdjRoE(statements.balanceSheets[0], "fcf", statements.keyMetrics[0]),
+            reinvestment_Rate: reinvestmentRate,
+            expected_growth: expectedGrowth
             // sbc_factored_fcf_return_on_capital : freeCashFlowLessSBC/ totalCapital,
             // average_adjusted_fcf_return_on_capital: dict.getAdjAverages(statements.balanceSheets, "fcf", statements.keyMetrics),
         }
